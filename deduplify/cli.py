@@ -3,9 +3,9 @@ import logging
 import argparse
 from multiprocessing import cpu_count
 
-from hash_files import run_hash
-from compare_files import run_compare
-from del_empty_dirs import empty_dir_search
+from .hash_files import run_hash
+from .compare_files import run_compare
+from .del_empty_dirs import empty_dir_search
 
 CPUS = cpu_count()
 
@@ -21,7 +21,7 @@ def setup_logging(verbose=False):
     else:
         logging.basicConfig(
             level=logging.DEBUG,
-            filename="compare_filenames.log",
+            filename="deduplify.log",
             filemode="a",
             format="[%(asctime)s %(levelname)s] %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
