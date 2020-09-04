@@ -17,58 +17,11 @@ import os
 import sys
 import json
 import logging
-import argparse
 from tqdm import tqdm
 from collections import Counter
-from multiprocessing import cpu_count
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Setup log config
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename="compare_filenames.log",
-    filemode="a",
-    format="[%(asctime)s %(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
-
-def parse_args():
-    """Parse arguments from the command line
-
-    Returns
-    -------
-        args {Namespace obj}: The arguments parsed from the command line
-    """
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--infile",
-        "-i",
-        default="duplicates.json",
-        help="Filename to analyse. Must be a .json file",
-    )
-    parser.add_argument(
-        "--length",
-        "-l",
-        type=int,
-        default=2,
-        help="Length of values to filter by",
-    )
-    parser.add_argument(
-        "--count",
-        "-c",
-        type=int,
-        default=4,
-        help="Number of threads to parallelise over",
-    )
-    parser.add_argument(
-        "--purge",
-        action="store_true",
-        help="If used, files WILL be deleted",
-    )
-
-    return parser.parse_args()
+logger = logging.getLogger()
 
 
 def filter_by_length(dict_to_filter, filter_length=2):
@@ -84,7 +37,7 @@ def filter_by_length(dict_to_filter, filter_length=2):
     -------
         filtered_dict {dict}: The filtered dictionary
     """
-    logging.info("Filtering based on length: %s" % filter_length)
+    logger.info("Filtering based on length: %s" % filter_length)
 
     filtered_dict = {
         key: value
@@ -93,7 +46,7 @@ def filter_by_length(dict_to_filter, filter_length=2):
     }
 
     if len(filtered_dict) == 0:
-        logging.info(
+        logger.info(
             "There are no filenames to compare! Please choose a different filter_length."
         )
         sys.exit()
@@ -114,7 +67,6 @@ def compare_filenames(file_list):
                         is returned to be deleted.
     """
     file_list.sort()  # Sort the list of filepaths alphabetically
-    file_lengths = [len(filename) for filename in file_list]  # Get the string lengths
     filenames = [filename.split("/")[-1] for filename in file_list]  # Get the filenames
     name_freq = Counter(filenames)  # Count the frequency of the filenames
 
@@ -135,7 +87,7 @@ def delete_files(files, workers):
         files {list}: List of files to delete
         workers {int}: Number of threads to parallelise over
     """
-    logging.info("Deleting files...")
+    logger.info("Deleting files...")
     pbar = tqdm(total=len(files))
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
@@ -144,48 +96,30 @@ def delete_files(files, workers):
             pbar.update(1)
 
     pbar.close()
-    logging.info("Deletion complete!")
+    logger.info("Deletion complete!")
 
 
-def main():
+def run_compare(infile, purge, count):
     """Main function"""
-    args = parse_args()
-
-    if not args.infile.endswith(".json"):
-        raise ValueError("Please provide a JSON input file!")
-
-    cpus = cpu_count()
-    if args.count > cpus:
-        raise ValueError(
-            "You have requested more threads than are available to this machine. "
-            f"This machine has {cpus} CPUs. "
-            "Please reduce your value of --count accordingly."
-        )
 
     # Load the file into a dictionary
-    logging.info("Loading in file: %s" % args.infile)
-    with open(args.infile, "r") as stream:
+    logger.info("Loading in file: %s" % infile)
+    with open(infile, "r") as stream:
         files = json.load(stream)
-    logging.info("Done!")
+    logger.info("Done!")
 
     # Filter the dictionary
-    files = filter_by_length(files, filter_length=args.length)
-    logging.info("Number of files to compare: %s" % (args.length * len(files)))
+    files = filter_by_length(files)
+    logger.info("Number of files to compare: %s" % (len(files)))
 
     # Determine which filenames are duplicated
     files_to_delete = []
-    logging.info("Comparing filenames...")
+    logger.info("Comparing filenames...")
     for key, value in tqdm(files.items(), total=len(files)):
         files_to_delete.extend(compare_filenames(value))
-    logging.info("Done!")
+    logger.info("Done!")
 
-    logging.info(
-        "Number of files that can be safely deleted: %s" % len(files_to_delete)
-    )
+    logger.info("Number of files that can be safely deleted: %s" % len(files_to_delete))
 
-    if args.purge:
-        delete_files(files_to_delete, args.count)
-
-
-if __name__ == "__main__":
-    main()
+    if purge:
+        delete_files(files_to_delete, count)
