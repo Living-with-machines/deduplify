@@ -24,30 +24,25 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 logger = logging.getLogger()
 
 
-def filter_by_length(dict_to_filter, filter_length=2):
-    """Filter a dictionary to return key-value pairs where the value is equal to
-    a given length.
+def filter_by_length(dict_to_filter):
+    """Filter a dictionary to return key-value pairs where the value's length is
+    greater than 1.
 
-    Arguments
-    ---------
-        dict_to_filter {dict}: The dictionary to be filtered
-        filter_length {int}: The length of the values to filter for (default: 2)
+    Args:
+        dict_to_filter (dict): The dictionary to be filtered
 
-    Returns
-    -------
-        filtered_dict {dict}: The filtered dictionary
+    Returns:
+        filtered_dict (dict): The filtered dictionary
     """
-    logger.info("Filtering based on length: %s" % filter_length)
-
     filtered_dict = {
         key: value
         for (key, value) in dict_to_filter.items()
-        if len(value) == filter_length
+        if len(value) > 1
     }
 
     if len(filtered_dict) == 0:
         logger.info(
-            "There are no filenames to compare! Please choose a different filter_length."
+            "There are no filenames to compare!"
         )
         sys.exit()
 
