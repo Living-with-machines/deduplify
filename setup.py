@@ -8,7 +8,9 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 # Package meta-data.
 AUTHOR = "Sarah Gibson"
-DESCRIPTION = "A Python package to search for and remove duplicated files in messy datasets"
+DESCRIPTION = (
+    "A Python package to search for and remove duplicated files in messy datasets"
+)
 EMAIL = "sgibson@turing.ac.uk"
 LICENSE = "MIT"
 LICENSE_TROVE = "License :: OSI Approved :: MIT License"
@@ -67,9 +69,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(
-        exclude=["tests", "*.tests", "*.tests.*", "tests.*"]
-    ),
+    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
