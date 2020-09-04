@@ -17,22 +17,21 @@ import json
 import hashlib
 import logging
 from tqdm import tqdm
+from typing import Tuple
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger()
 
 
-def walk_dir(dir_to_walk):
+def walk_dir(dir_to_walk: str) -> list:
     """Walk a directory structure from a given directory
 
-    Arguments
-    ---------
-        dir_to_walk {str}: The path of the directory to begin walking from
+    Args:
+        dir_to_walk (str): The path of the directory to begin walking from
 
-    Returns
-    -------
-        files {list}: A list of the filepaths contained within dir_to_walk
+    Returns:
+        files (list): A list of the filepaths contained within dir_to_walk
     """
     logger.info("Walking structure of: %s..." % dir_to_walk)
     files = []  # Empty list to save filepaths to
@@ -51,18 +50,17 @@ def walk_dir(dir_to_walk):
     return files
 
 
-def hashfile(path, blocksize=65536):
+def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
     """Calculate the MD5 hash of a given file
 
-    Arguments
-    ---------
-        path {str, os.path}: Path to the file to generate a hash for
-        blocksize {int}: Memory size to read in the file (default: 65536)
+    Args:
+        path ()str, os.path): Path to the file to generate a hash for
+        blocksize (int, optional): Memory size to read in the file
+                                   Default: 65536
 
-    Returns
-    -------
-        hash {str}: The HEX digest hash of the given file
-        path {str}: The filepath that generated the hash
+    Returns:
+        hash (str): The HEX digest hash of the given file
+        path (str): The filepath that generated the hash
     """
     # Instatiate the hashlib module with md5
     hasher = hashlib.md5()
@@ -78,22 +76,20 @@ def hashfile(path, blocksize=65536):
 
     f.close()
 
-    return (hasher.hexdigest(), path)
+    return hasher.hexdigest(), path
 
 
-def generate_hashes(files, workers):
+def generate_hashes(files: str, workers: int) -> dict:
     """Generate MD5 hashes for a list of files (in parallel)
 
-    Arguments
-    ---------
-        files {list}: Files to generate an MD5 hash for
-        workers {int}: Number of threads to parallelise over
+    Args:
+        files (list): Files to generate an MD5 hash for
+        workers (int): Number of threads to parallelise over
 
-    Results
-    -------
-        hashes {dict}: A dict of the hashes [keys] and files that generated them
-                       [values]. Hashes with more than one file in their value
-                       list are considered duplicated.
+    Results:
+        hashes (dict): A dict of the hashes [keys] and files that generated
+                       them [values]. Hashes with more than one file in their
+                       value list are considered duplicated.
     """
     logger.info("Generating MD5 hashes for files...")
     hashes = defaultdict(list)  # Empty dict to store hashes in
@@ -112,20 +108,18 @@ def generate_hashes(files, workers):
     return hashes
 
 
-def filter_dict(results):
+def filter_dict(results: dict) -> Tuple[dict, dict]:
     """Filter a given dictionary into two separate dictionaries based on the
-    conditional that the length of the values is either greater than or equal to
-    unity.
+    conditional that the length of the values is either greater than or equal
+    to unity.
 
-    Arguments
-    ---------
-        results {dict}: Dictionary to be filtered
+    Args:
+        results (dict): Dictionary to be filtered
 
-    Results
-    -------
-        duplicated {dict}: Dictionary where len(values) > 1. Considered to be
+    Results:
+        duplicated (dict): Dictionary where len(values) > 1. Considered to be
                            duplicated hashes.
-        unique {dict}: Dictionary where len(values) == 1. Considered to be
+        unique (dict): Dictionary where len(values) == 1. Considered to be
                        unique hashes.
     """
     logger.info("Filtering the results...")
@@ -144,20 +138,26 @@ def filter_dict(results):
     return duplicated, unique
 
 
-def dict_to_json_file(filename, dict_content):
+def dict_to_json_file(filename: str, dict_content: dict):
     """Write a dictionary to a JSON file
 
-    Arguments
-    ---------
-        filename {str}: Filename to write to. Must be `.json`.
-        dict_content {dict}: Dictionary containing the content to write
+    Args:
+        filename (str): Filename to write to. Must be `.json`.
+        dict_content (dict): Dictionary containing the content to write
     """
     with open(filename, "w") as f:
         f.write(json.dumps(dict_content, indent=2, sort_keys=True))
 
 
-def main(dir, count, dupfile, unfile):
-    """Main function"""
+def run_hash(dir: str, count: int, dupfile: str, unfile: str):
+    """Hash files within a directory structure
+
+    Args:
+        dir (str): Root directory to search under
+        count (int): Number of threads to parallelise over
+        dupfile (str): JSON file location for duplicated hashes
+        unfile (str): JSON file location for unique hashes
+    """
     # Check the directory path exists
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
