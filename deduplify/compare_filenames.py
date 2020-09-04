@@ -52,13 +52,11 @@ def filter_by_length(dict_to_filter):
 def compare_filenames(file_list):
     """Compare filenames for equivalence.
 
-    Arguments
-    ---------
-        file_list {list}: A list of filepaths to be checked
+    Args:
+        file_list (list): A list of filepaths to be checked
 
-    Returns
-    -------
-        filepath {str}: In the case when filenames are identical, one filepath
+    Returns:
+        filepath (str): In the case when filenames are identical, one filepath
                         is returned to be deleted.
     """
     file_list.sort()  # Sort the list of filepaths alphabetically
@@ -77,10 +75,9 @@ def compare_filenames(file_list):
 def delete_files(files, workers):
     """Delete filepaths
 
-    Arguments
-    ---------
-        files {list}: List of files to delete
-        workers {int}: Number of threads to parallelise over
+    Args:
+        files (list): List of files to delete
+        workers (int): Number of threads to parallelise over
     """
     logger.info("Deleting files...")
     pbar = tqdm(total=len(files))
