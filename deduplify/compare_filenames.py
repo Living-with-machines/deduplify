@@ -92,8 +92,13 @@ def delete_files(files, workers):
 
 
 def run_compare(infile, purge, count):
-    """Main function"""
+    """Compare files for duplicated hashes
 
+    Args:
+        infile (str): JSON location of filepaths and hashes
+        purge (bool): Delete duplicated files
+        count (int): Number of threadsto parallelise over
+    """
     # Load the file into a dictionary
     logger.info("Loading in file: %s" % infile)
     with open(infile, "r") as stream:
