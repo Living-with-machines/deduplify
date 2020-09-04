@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 logger = logging.getLogger()
 
 
-def filter_by_length(dict_to_filter):
+def filter_by_length(dict_to_filter: dict) -> dict:
     """Filter a dictionary to return key-value pairs where the value's length is
     greater than 1.
 
@@ -35,21 +35,17 @@ def filter_by_length(dict_to_filter):
         filtered_dict (dict): The filtered dictionary
     """
     filtered_dict = {
-        key: value
-        for (key, value) in dict_to_filter.items()
-        if len(value) > 1
+        key: value for (key, value) in dict_to_filter.items() if len(value) > 1
     }
 
     if len(filtered_dict) == 0:
-        logger.info(
-            "There are no filenames to compare!"
-        )
+        logger.info("There are no filenames to compare!")
         sys.exit()
 
     return filtered_dict
 
 
-def compare_filenames(file_list):
+def compare_filenames(file_list: list) -> str:
     """Compare filenames for equivalence.
 
     Args:
@@ -72,7 +68,7 @@ def compare_filenames(file_list):
         )
 
 
-def delete_files(files, workers):
+def delete_files(files: list, workers: int):
     """Delete filepaths
 
     Args:
@@ -91,7 +87,7 @@ def delete_files(files, workers):
     logger.info("Deletion complete!")
 
 
-def run_compare(infile, purge, count):
+def run_compare(infile: str, purge: bool, count: int):
     """Compare files for duplicated hashes
 
     Args:
