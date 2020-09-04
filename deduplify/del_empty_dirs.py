@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger()
 
 
-def empty_dir_search(dir_to_walk):
+def empty_dir_search(dir_to_walk: str):
     """Walk over the directory structure under a given parent directory. If a
     directory is empty, delete it.
 
