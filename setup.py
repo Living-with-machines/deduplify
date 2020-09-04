@@ -2,7 +2,6 @@ import io
 import os
 
 from setuptools import find_packages, setup
-from distutils.extension import Extension
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -14,14 +13,14 @@ DESCRIPTION = (
 EMAIL = "sgibson@turing.ac.uk"
 LICENSE = "MIT"
 LICENSE_TROVE = "License :: OSI Approved :: MIT License"
-NAME = "cdeduplify"
+NAME = "deduplify"
 REQUIRES_PYTHON = ">=3.7.0"
 URL = "https://github.com/Living-with-Machines/deduplify"
 VERSION = None
 
 # What packages are required for this module to be executed?
 with open(os.path.join(here, "requirements.txt"), "r") as f:
-    REQUIRED = [line.strip("\n") for line in f.readline()]
+    REQUIRED = [line.strip("\n") for line in f.readlines()]
 
 full_require = []
 docs_require = []
@@ -75,7 +74,7 @@ setup(
     include_package_data=True,
     license=LICENSE,
     ext_modules=[],
-    entry_points={},
+    entry_points={"console_scripts": ["deduplify = deduplify.cli:main"]},
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
