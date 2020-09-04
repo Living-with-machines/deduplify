@@ -149,7 +149,7 @@ def dict_to_json_file(filename: str, dict_content: dict):
         f.write(json.dumps(dict_content, indent=2, sort_keys=True))
 
 
-def run_hash(dir: str, count: int, dupfile: str, unfile: str):
+def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
     """Hash files within a directory structure
 
     Args:

@@ -3,6 +3,10 @@ import logging
 import argparse
 from multiprocessing import cpu_count
 
+from hash_files import run_hash
+from compare_files import run_compare
+from del_empty_dirs import empty_dir_search
+
 CPUS = cpu_count()
 
 
@@ -39,6 +43,7 @@ def parse_args(args):
         "--count",
         type=int,
         default=4,
+        dest="count",
         help="Number of threads to parallelise over. Default: 4",
     )
     parser_base.add_argument(
@@ -60,10 +65,13 @@ def parse_args(args):
         parents=[parser_base, parser_pos],
         help="Generate hashes of all files in a directory tree",
     )
+    parser_hash.set_defaults(func=run_hash)
+
     parser_hash.add_argument(
         "-d",
         "--dupfile",
         type=str,
+        dest="dupfile",
         default="duplicates.json",
         help="Destination file for duplicated hashes. Must be a JSON file. Default: duplicates.json",
     )
@@ -71,6 +79,7 @@ def parse_args(args):
         "-u",
         "--unfile",
         type=str,
+        dest="unfile",
         default="uniques.json",
         help="Destination file for unique hashes. Must be a JSON file. Default: uniques.json",
     )
@@ -81,6 +90,8 @@ def parse_args(args):
         parents=[parser_base, parser_pos],
         help="Compare hashes for duplicated files",
     )
+    parser_compare.set_defaults(func=run_compare)
+
     parser_compare.add_argument(
         "-i",
         "--infile",
@@ -93,9 +104,12 @@ def parse_args(args):
     )
 
     # Clean subcommand
-    subparsers.add_parser(
-        "clean", parents=[parser_base, parser_pos], help="Clean up empty subdirectories"
+    parser_clean = subparsers.add_parser(
+        "clean",
+        parents=[parser_base, parser_pos],
+        help="Clean up empty subdirectories",
     )
+    parser_clean.set_defaults(func=empty_dir_search)
 
     return parser.parse_args()
 
@@ -117,6 +131,7 @@ def main():
         )
 
     setup_logging(verbose=args.verbose)
+    args.func(**vars(args))
 
 
 if __name__ == "__main__":

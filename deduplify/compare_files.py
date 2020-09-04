@@ -87,7 +87,7 @@ def delete_files(files: list, workers: int):
     logger.info("Deletion complete!")
 
 
-def run_compare(infile: str, purge: bool, count: int):
+def run_compare(infile: str, purge: bool, count: int, **kwargs):
     """Compare files for duplicated hashes
 
     Args:
