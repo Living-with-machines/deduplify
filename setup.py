@@ -24,7 +24,7 @@ with open(os.path.join(here, "requirements.txt"), "r") as f:
 
 full_require = []
 docs_require = []
-test_require = full_require + []
+test_require = full_require + ["pytest"]
 dev_require = []
 
 # What packages are optional?
