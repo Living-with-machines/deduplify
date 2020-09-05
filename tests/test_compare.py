@@ -1,5 +1,10 @@
 from unittest.mock import patch, call
-from deduplify.compare_files import filter_by_length, compare_filenames, delete_files, run_compare
+from deduplify.compare_files import (
+    filter_by_length,
+    compare_filenames,
+    delete_files,
+    run_compare,
+)
 
 
 def test_filter_by_length():
