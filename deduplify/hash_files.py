@@ -7,47 +7,17 @@ together files that have generated the same hash.
 
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
-Requirements: tqdm
-
->>> pip install tqdm
 """
 
 import os
 import json
 import hashlib
 import logging
-from tqdm import tqdm
 from typing import Tuple
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger()
-
-
-def walk_dir(dir_to_walk: str) -> list:
-    """Walk a directory structure from a given directory
-
-    Args:
-        dir_to_walk (str): The path of the directory to begin walking from
-
-    Returns:
-        files (list): A list of the filepaths contained within dir_to_walk
-    """
-    logger.info("Walking structure of: %s..." % dir_to_walk)
-    files = []  # Empty list to save filepaths to
-
-    # Walk through ROOT_DIR directory structure
-    for dirName, subdirs, fileList in tqdm(os.walk(dir_to_walk)):
-        for filename in fileList:
-            # Create filepath
-            filepath = os.path.join(dirName, filename)
-            # Append filepath to dict
-            files.append(filepath)
-
-    logger.info("Completed!")
-    logger.info("Total number of files: %s" % len(files))
-
-    return files
 
 
 def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
@@ -77,35 +47,6 @@ def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
     f.close()
 
     return hasher.hexdigest(), path
-
-
-def generate_hashes(files: str, workers: int) -> dict:
-    """Generate MD5 hashes for a list of files (in parallel)
-
-    Args:
-        files (list): Files to generate an MD5 hash for
-        workers (int): Number of threads to parallelise over
-
-    Results:
-        hashes (dict): A dict of the hashes [keys] and files that generated
-                       them [values]. Hashes with more than one file in their
-                       value list are considered duplicated.
-    """
-    logger.info("Generating MD5 hashes for files...")
-    hashes = defaultdict(list)  # Empty dict to store hashes in
-
-    pbar = tqdm(total=len(files))
-
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = [executor.submit(hashfile, filename) for filename in files]
-        for future in as_completed(futures):
-            hash, filepath = future.result()
-            hashes[hash].append(filepath)
-            pbar.update(1)
-
-    pbar.close()
-
-    return hashes
 
 
 def filter_dict(results: dict) -> Tuple[dict, dict]:
@@ -162,8 +103,20 @@ def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
 
-    filepaths = walk_dir(dir)  # Collect filepaths
-    hashes = generate_hashes(filepaths, count)  # Hash the files
+    logger.info("Walking structure of: %s" % dir)
+    logger.info("Generating MD5 hashes for files...")
+    hashes = defaultdict(list)  # Empty dict to store hashes in
+
+    for dirName, subdirs, fileList in os.walk(dir):
+        with ThreadPoolExecutor(max_workers=count) as executor:
+            futures = [
+                executor.submit(hashfile, os.path.join(dirName, filename))
+                for filename in fileList
+            ]
+            for future in as_completed(futures):
+                hash, filepath = future.result()
+                hashes[hash].append(filepath)
+
     dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
 
     for filename, content in zip([dupfile, unfile], [dup_dict, unique_dict]):
