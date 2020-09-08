@@ -24,7 +24,7 @@ def test_compare_filenames():
     out_file_list = compare_filenames(test_file_list)
 
     assert len(out_file_list) == 1
-    assert out_file_list == ["path/to/test/file.txt"]
+    assert out_file_list == ["different/path/to/test/file.txt"]
 
 
 @patch("deduplify.compare_files.os.remove")
@@ -38,6 +38,15 @@ def test_delete_files(mock):
     mock.assert_has_calls(test_calls)
 
 
-def test_run_compare_no_purge():
+@patch("deduplify.compare_files.os.remove")
+def test_run_compare_and_purge(mock):
     infile = "tests/assets/test_infile.json"
-    run_compare(infile, False, 1)
+    test_calls = [
+        call("different/path/to/test/file_1.txt"),
+        call("different/path/to/test/file_2.txt"),
+    ]
+
+    run_compare(infile, True, 1)
+
+    assert mock.call_count == 2
+    mock.assert_has_calls(test_calls)
