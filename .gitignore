@@ -130,3 +130,7 @@ dmypy.json
 
 # Ignore dir created for tests
 **/testdir/**
+
+# Ignore JSON output files
+**/duplicates.json
+**/uniques.json
