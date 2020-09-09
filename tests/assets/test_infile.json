@@ -1,0 +1,10 @@
+{
+    "hash1": [
+        "path/to/test/file_1.txt",
+        "different/path/to/test/file_1.txt"
+    ],
+    "hash2": [
+        "path/to/test/file_2.txt",
+        "different/path/to/test/file_2.txt"
+    ]
+}

@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Ignore dir created for tests
+**/testdir/**
+
+# Ignore JSON output files
+**/duplicates.json
+**/uniques.json

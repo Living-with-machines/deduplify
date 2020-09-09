@@ -52,15 +52,16 @@ def compare_filenames(file_list: list) -> str:
         file_list (list): A list of filepaths to be checked
 
     Returns:
-        filepath (str): In the case when filenames are identical, one filepath
-                        is returned to be deleted.
+        file_list (list): In the case when filenames are identical, the
+                          shortest filepath is removed from the list and the
+                          rest are returned to be deleted.
     """
     file_list.sort()  # Sort the list of filepaths alphabetically
     filenames = [filename.split("/")[-1] for filename in file_list]  # Get the filenames
     name_freq = Counter(filenames)  # Count the frequency of the filenames
 
     if len(name_freq) == 1:
-        file_list.remove(max(file_list, key=len))
+        file_list.remove(min(file_list, key=len))
         return file_list
     else:
         raise ValueError(
