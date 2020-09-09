@@ -79,17 +79,6 @@ def filter_dict(results: dict) -> Tuple[dict, dict]:
     return duplicated, unique
 
 
-def dict_to_json_file(filename: str, dict_content: dict):
-    """Write a dictionary to a JSON file
-
-    Args:
-        filename (str): Filename to write to. Must be `.json`.
-        dict_content (dict): Dictionary containing the content to write
-    """
-    with open(filename, "w") as f:
-        f.write(json.dumps(dict_content, indent=2, sort_keys=True))
-
-
 def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
     """Hash files within a directory structure
 
@@ -121,4 +110,5 @@ def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
 
     for filename, content in zip([dupfile, unfile], [dup_dict, unique_dict]):
         logger.info("Writing outputs to: %s" % filename)
-        dict_to_json_file(filename, content)
+        with open(filename, "w") as f:
+            f.write(json.dumps(content, indent=2, sort_keys=True))
