@@ -42,9 +42,9 @@ def parse_args(args):
         "-c",
         "--count",
         type=int,
-        default=4,
+        default=1,
         dest="count",
-        help="Number of threads to parallelise over. Default: 4",
+        help="Number of threads to parallelise over. Default: 1",
     )
     parser_base.add_argument(
         "-v",
