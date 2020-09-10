@@ -14,6 +14,7 @@ A Python tool to search for and remove duplicated files in messy datasets.
   - [Comparing files](#comparing-files)
   - [Cleaning up](#cleaning-up)
   - [Global arguments](#global-arguments)
+- [Contributing](#contributing)
 
 ---
 
@@ -139,3 +140,8 @@ The following flags can be passed to any of the commands of `deduplify`.
 - `--count [-c]`: Some processes within `deduplify` can be parallelised over multiple threads when working with larger datasets.
   To do this, include the `--count` flag with the (integer) number of threads you'd like to parallelise over.
   This flag will raise an error if requesting more threads than CPUs available on the host machine.
+
+## Contributing
+
+Thank you for wanting to contribute to `deduplify`! :tada: :sparkling_heart:
+To get you started, please read our [Code of Conduct](./CODE_OF_CONDUCT.md) and [Contributing Guidelines](./CONTRIBUTING.md).
