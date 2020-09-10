@@ -20,12 +20,13 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 with open(os.path.join(here, "requirements.txt"), "r") as f:
-    REQUIRED = [line.strip("\n") for line in f.readlines()]
+    required = [line.strip("\n") for line in f.readlines()]
 
+REQUIRED = required + ["incremental"]
 full_require = []
 docs_require = []
 test_require = full_require + ["pytest", "coverage"]
-dev_require = []
+dev_require = ["incremental"]
 
 # What packages are optional?
 EXTRAS = {
@@ -48,19 +49,9 @@ try:
 except FileNotFoundError:
     long_description = DESCRIPTION
 
-# Load the package's __version__.py module as a dictionary.
-about = {}
-if not VERSION:
-    project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
-    with open(os.path.join(here, project_slug, "__version__.py")) as f:
-        exec(f.read(), about)
-else:
-    about["__version__"] = VERSION
-
 # Where the magic happens:
 setup(
     name=NAME,
-    version=about["__version__"],
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -83,4 +74,6 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
+    use_incremental=True,
+    setup_requires=["incremental"],
 )
