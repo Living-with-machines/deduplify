@@ -42,9 +42,9 @@ def parse_args(args):
         "-c",
         "--count",
         type=int,
-        default=4,
+        default=1,
         dest="count",
-        help="Number of threads to parallelise over. Default: 4",
+        help="Number of threads to parallelise over. Default: 1",
     )
     parser_base.add_argument(
         "-v",
@@ -87,7 +87,7 @@ def parse_args(args):
     # Compare subcommand
     parser_compare = subparsers.add_parser(
         "compare",
-        parents=[parser_base, parser_pos],
+        parents=[parser_base],
         help="Compare hashes for duplicated files",
     )
     parser_compare.set_defaults(func=run_compare)
