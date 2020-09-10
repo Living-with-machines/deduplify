@@ -87,7 +87,7 @@ def parse_args(args):
     # Compare subcommand
     parser_compare = subparsers.add_parser(
         "compare",
-        parents=[parser_base, parser_pos],
+        parents=[parser_base],
         help="Compare hashes for duplicated files",
     )
     parser_compare.set_defaults(func=run_compare)
