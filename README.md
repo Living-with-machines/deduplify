@@ -9,6 +9,7 @@ A Python tool to search for and remove duplicated files in messy datasets.
 
 - [Overview](#overview)
 - [Installation](#installation)
+  - [From PyPI](#from-pypi)
   - [Manual Installation](#manual-installation)
 - [Usage](#usage)
   - [Hashing files](#hashing-files)
@@ -27,6 +28,20 @@ It generates an MD5 hash for each file recursively under a target directory, gro
 ## Installation
 
 `deduplify` has a minimum Python requirement of v3.7 but has been developed in v3.8.
+
+### From PyPI
+
+First, make sure your `pip` version is up-to-date.
+
+```bash
+python -m pip install --upgrade pip
+```
+
+Then install `deduplify`.
+
+```bash
+pip install deduplify
+```
 
 ### Manual Installation
 
