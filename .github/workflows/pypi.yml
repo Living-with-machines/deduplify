@@ -1,0 +1,51 @@
+name: Publish deduplify to PyPI
+
+on:
+  release:
+    types:
+      - published
+  pull_request:
+    paths:
+      - "**/*.py"
+
+jobs:
+  publish-pypi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install twine
+        run: |
+          python -m pip install -U pip
+          pip install twine
+
+      - name: Build distribution
+        run: |
+          python setup.py sdist bdist_wheel
+
+      - name: Test distribution
+        run: |
+          twine check dist/*
+
+      - name: Publish to Test PyPI
+        if: github.event.pull_request
+        run: |
+          twine upload \
+          --repository-url https://test.pypi.org/legacy/ \
+          -u ${{ secrets.PYPI_USERNAME }} \
+          -p ${{ secrets.TEST_PYPI_PASSWORD }} \
+          dist/*
+
+      - name: Publish to PyPI
+        if: github.event_name != 'pull_request'
+        run: |
+          twine upload \
+          -u ${{ secrets.PYPI_USERNAME }} \
+          -p ${{ secrets.PYPI_PASSWORD }} \
+          dist/*
