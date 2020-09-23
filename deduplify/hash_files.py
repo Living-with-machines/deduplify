@@ -111,4 +111,4 @@ def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
     for filename, content in zip([dupfile, unfile], [dup_dict, unique_dict]):
         logger.info("Writing outputs to: %s" % filename)
         with open(filename, "w") as f:
-            f.write(json.dumps(content, indent=2, sort_keys=True))
+            json.dump(content, f, indent=2, sort_keys=True)
