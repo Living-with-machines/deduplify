@@ -57,7 +57,9 @@ def compare_filenames(file_list: list) -> str:
                           rest are returned to be deleted.
     """
     file_list.sort()  # Sort the list of filepaths alphabetically
-    filenames = [filename.split("/")[-1] for filename in file_list]  # Get the filenames
+    filenames = [
+        os.path.basename(filename) for filename in file_list
+    ]  # Get the filenames
     name_freq = Counter(filenames)  # Count the frequency of the filenames
 
     if len(name_freq) == 1:
