@@ -81,7 +81,7 @@ def delete_files(files: list, workers: int):
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [executor.submit(os.remove, filename) for filename in files]
-        for future in as_completed(futures):
+        for _ in as_completed(futures):
             pbar.update(1)
 
     pbar.close()
@@ -109,7 +109,7 @@ def run_compare(infile: str, purge: bool, count: int, **kwargs):
     # Determine which filenames are duplicated
     files_to_delete = []
     logger.info("Comparing filenames...")
-    for key, value in tqdm(files.items(), total=len(files)):
+    for value in tqdm(files.values(), total=len(files)):
         files_to_delete.extend(compare_filenames(value))
     logger.info("Done!")
 

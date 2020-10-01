@@ -71,7 +71,7 @@ def filter_dict(results: dict) -> Tuple[dict, dict]:
     logger.info("Number of unique files: %s" % len(unique))
 
     total = 0
-    for key, value in duplicated.items():
+    for value in duplicated.values():
         total += len(value)
 
     logger.info("Number of identical files: %s" % total)
