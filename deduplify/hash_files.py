@@ -10,6 +10,7 @@ Python version: >=3.7 (developed with 3.8)
 """
 
 import os
+import sys
 import json
 import hashlib
 import logging
@@ -95,6 +96,7 @@ def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
     hashes = defaultdict(list)  # Empty dict to store hashes in
+    counter = 0
 
     for dirName, subdirs, fileList in os.walk(dir):
         with ThreadPoolExecutor(max_workers=count) as executor:
@@ -105,6 +107,10 @@ def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
             for future in as_completed(futures):
                 hash, filepath = future.result()
                 hashes[hash].append(filepath)
+
+                counter += 1
+                print(f"Total files hashed: {counter}", end="\r")
+                sys.stdout.flush()
 
     dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
 
