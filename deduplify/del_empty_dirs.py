@@ -9,6 +9,7 @@ Python version: >= 3.7 (developed with 3.8)
 """
 
 import os
+import sys
 import logging
 
 logger = logging.getLogger()
@@ -21,7 +22,18 @@ def empty_dir_search(dir: str, **kwargs):
     Args:
         dir (str): Directory to begin walk from
     """
+    counter = 0
+    deleted = 0
+
     for dirname, _, _ in os.walk(dir, topdown=False):
+        counter += 1
+
         if len(os.listdir(dirname)) == 0:
             logger.info("EMPTY: %s" % dirname)
             os.rmdir(dirname)
+            deleted += 1
+
+        print(
+            f"Total directories: {counter} / Directories deleted: {deleted}", end="\r"
+        )
+        sys.stdout.flush()
