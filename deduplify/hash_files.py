@@ -14,12 +14,34 @@ import sys
 import json
 import hashlib
 import logging
+import subprocess
 from typing import Tuple
 from itertools import chain
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger()
+
+
+def get_total_number_of_files(dir: str, file_ext: str = ".xml") -> int:
+    """Count the total number of files of a given extension in a directory.
+
+    Args:
+        dir (str): The target directory to search.
+        file_ext (str): The file extension to search for. Default: .xml
+
+    Returns:
+        int: The number of files with the matching extension within the tree
+            of the target directory
+    """
+    find_cmd = ["find", dir, "-type", "f", "-name", f'"*{file_ext}"']
+    wc_cmd = ["wc", "-l"]
+
+    find_proc = subprocess.Popen(find_cmd, stdout=subprocess.PIPE)
+    output = subprocess.check_output(wc_cmd, stdin=find_proc.stdout)
+    find_proc.wait()
+
+    return int(output.decode("utf-8").strip("\n"))
 
 
 def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
@@ -98,6 +120,8 @@ def run_hash(
     # Check the directory path exists
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
+
+    total_file_number = get_total_number_of_files(dir)
 
     if restart:
         for input_file in [dupfile, unfile]:
