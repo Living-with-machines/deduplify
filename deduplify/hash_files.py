@@ -116,7 +116,6 @@ def run_hash(
         files_to_skip = list(chain(*pre_hashed_dict.values()))
     else:
         files_to_skip = []
-    print(files_to_skip[:10])
 
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
