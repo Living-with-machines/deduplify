@@ -83,6 +83,11 @@ def parse_args(args):
         default="uniques.json",
         help="Destination file for unique hashes. Must be a JSON file. Default: uniques.json",
     )
+    parser_hash.add_argument(
+        "--restart",
+        action="store_true",
+        help="Restart a run of hashing files and skip over files that have already been hashed. Output files containing duplicated and unique filenames must already exist.",
+    )
 
     # Compare subcommand
     parser_compare = subparsers.add_parser(
