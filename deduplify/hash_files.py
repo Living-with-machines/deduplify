@@ -15,6 +15,7 @@ import json
 import hashlib
 import logging
 import subprocess
+from tqdm import tqdm
 from typing import Tuple
 from itertools import chain
 from collections import defaultdict
@@ -151,6 +152,8 @@ def run_hash(
     else:
         hashes = defaultdict(list)  # Empty dict to store hashes in
 
+    pbar = tqdm(total=total_file_number - len(files_to_skip))
+
     for dirName, _, fileList in os.walk(dir):
         with ThreadPoolExecutor(max_workers=count) as executor:
             futures = [
@@ -165,6 +168,10 @@ def run_hash(
                 # counter += 1
                 # print(f"Total files hashed: {counter}", end="\r")
                 # sys.stdout.flush()
+
+                pbar.update(1)
+
+    pbar.close()
 
     dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
 
