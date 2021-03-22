@@ -143,7 +143,7 @@ def run_hash(
 
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
-    counter = 0
+    # counter = 0
     if restart:
         hashes = pre_hashed_dict.copy()
     else:
@@ -160,9 +160,9 @@ def run_hash(
                 hash, filepath = future.result()
                 hashes[hash].append(filepath)
 
-                counter += 1
-                print(f"Total files hashed: {counter}", end="\r")
-                sys.stdout.flush()
+                # counter += 1
+                # print(f"Total files hashed: {counter}", end="\r")
+                # sys.stdout.flush()
 
     dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
 
