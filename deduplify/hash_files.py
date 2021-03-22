@@ -8,9 +8,9 @@ together files that have generated the same hash.
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
+# import sys
 
 import os
-# import sys
 import json
 import hashlib
 import logging
