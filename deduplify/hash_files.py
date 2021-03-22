@@ -15,6 +15,7 @@ import json
 import hashlib
 import logging
 from typing import Tuple
+from itertools import chain
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -80,7 +81,9 @@ def filter_dict(results: dict) -> Tuple[dict, dict]:
     return duplicated, unique
 
 
-def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
+def run_hash(
+    dir: str, count: int, dupfile: str, unfile: str, restart: bool = False, **kwargs
+):
     """Hash files within a directory structure
 
     Args:
@@ -88,21 +91,47 @@ def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
         count (int): Number of threads to parallelise over
         dupfile (str): JSON file location for duplicated hashes
         unfile (str): JSON file location for unique hashes
+        restart (bool): If true, will restart a hash run. dupfile and unfile
+            must exist since the filenames already hashed will be skipped.
+            Default: False.
     """
     # Check the directory path exists
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
 
+    if restart:
+        for input_file in [dupfile, unfile]:
+            if not os.path.isfile(input_file):
+                raise FileNotFoundError(
+                    f"{input_file} must exist to restart a hash run!"
+                )
+
+        with open(dupfile) as stream:
+            dup_dict = json.load(stream)
+
+        with open(unfile) as stream:
+            un_dict = json.load(stream)
+
+        pre_hashed_dict = {**dup_dict, **un_dict}
+        files_to_skip = list(chain(*pre_hashed_dict.values()))
+    else:
+        files_to_skip = []
+    print(files_to_skip[:10])
+
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
-    hashes = defaultdict(list)  # Empty dict to store hashes in
     counter = 0
+    if restart:
+        hashes = pre_hashed_dict.copy()
+    else:
+        hashes = defaultdict(list)  # Empty dict to store hashes in
 
-    for dirName, subdirs, fileList in os.walk(dir):
+    for dirName, _, fileList in os.walk(dir):
         with ThreadPoolExecutor(max_workers=count) as executor:
             futures = [
                 executor.submit(hashfile, os.path.join(dirName, filename))
                 for filename in fileList
+                if filename not in files_to_skip
             ]
             for future in as_completed(futures):
                 hash, filepath = future.result()
