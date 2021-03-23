@@ -105,7 +105,7 @@ def filter_dict(results: dict) -> Tuple[dict, dict]:
     for value in duplicated.values():
         total += len(value)
 
-    logger.info("Number of identical files: %s" % total)
+    logger.info("Number of duplicated files: %s" % total)
 
     return duplicated, unique
 
