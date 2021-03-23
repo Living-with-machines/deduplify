@@ -143,6 +143,9 @@ def run_hash(
         with open(unfile) as stream:
             un_dict = json.load(stream)
 
+        for key, value in un_dict.items():
+            un_dict[key] = [value]
+
         pre_hashed_dict = {**dup_dict, **un_dict}
         files_to_skip = list(chain(*pre_hashed_dict.values()))
     else:
@@ -152,7 +155,7 @@ def run_hash(
     logger.info("Generating MD5 hashes for files...")
     # counter = 0
     if restart:
-        hashes = defaultdict(lambda: None, pre_hashed_dict)
+        hashes = defaultdict(list, pre_hashed_dict)
     else:
         hashes = defaultdict(list)  # Empty dict to store hashes in
 
