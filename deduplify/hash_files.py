@@ -128,8 +128,6 @@ def run_hash(
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
 
-    total_file_number = get_total_number_of_files(dir)
-
     if restart:
         logger.info("Restarting hashing process")
 
@@ -158,7 +156,8 @@ def run_hash(
     else:
         hashes = defaultdict(list)  # Empty dict to store hashes in
 
-    pbar = tqdm(total=total_file_number - len(files_to_skip))
+    total = 10410200 - len(files_to_skip)
+    pbar = tqdm(total=total)
 
     for dirName, _, fileList in os.walk(dir):
         with ThreadPoolExecutor(max_workers=count) as executor:
