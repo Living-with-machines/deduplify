@@ -35,6 +35,8 @@ def get_total_number_of_files(dir: str, file_ext: str = ".xml") -> int:
         int: The number of files with the matching extension within the tree
             of the target directory
     """
+    logger.info("Calculating number of files that will be hashed")
+
     find_cmd = ["find", dir, "-type", "f", "-name", f'"*{file_ext}"']
     wc_cmd = ["wc", "-l"]
 
@@ -42,7 +44,11 @@ def get_total_number_of_files(dir: str, file_ext: str = ".xml") -> int:
     output = subprocess.check_output(wc_cmd, stdin=find_proc.stdout)
     find_proc.wait()
 
-    return int(output.decode("utf-8").strip("\n"))
+    output = int(output.decode("utf-8").strip("\n"))
+
+    logger.info("%s files to be hashed" % output)
+
+    return output
 
 
 def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
