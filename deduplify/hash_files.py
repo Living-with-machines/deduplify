@@ -24,11 +24,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 logger = logging.getLogger()
 
 
-def get_total_number_of_files(dir: str, file_ext: str = ".xml") -> int:
+def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
     """Count the total number of files of a given extension in a directory.
 
     Args:
-        dir (str): The target directory to search.
+        target_dir (str): The target directory to search.
         file_ext (str): The file extension to search for. Default: .xml
 
     Returns:
@@ -37,7 +37,7 @@ def get_total_number_of_files(dir: str, file_ext: str = ".xml") -> int:
     """
     logger.info("Calculating number of files that will be hashed")
 
-    find_cmd = ["find", dir, "-type", "f", "-name", f'"*{file_ext}"']
+    find_cmd = ["find", target_dir, "-type", "f", "-name", f'\"*{file_ext}\"']
     wc_cmd = ["wc", "-l"]
 
     find_proc = subprocess.Popen(find_cmd, stdout=subprocess.PIPE)
