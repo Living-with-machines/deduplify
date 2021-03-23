@@ -14,7 +14,7 @@ import os
 import json
 import hashlib
 import logging
-import subprocess
+import fnmatch
 from tqdm import tqdm
 from typing import Tuple
 from itertools import chain
@@ -22,6 +22,18 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger()
+
+
+def resolvepath(path):
+    """Resolve and normalize a path
+
+    1.  Handle tilde expansion; turn ~/.ssh into /home/user/.ssh and
+        ~otheruser/bin to /home/otheruser/bin
+    2.  Normalize the path so that it doesn't contain relative segments, turning
+        e.g. /usr/local/../bin to /usr/bin
+    3.  Get the real path of the actual file, resolving symbolic links
+    """
+    return os.path.realpath(os.path.normpath(os.path.expanduser(path)))
 
 
 def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
@@ -35,18 +47,12 @@ def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
         int: The number of files with the matching extension within the tree
             of the target directory
     """
-    logger.info("Calculating number of files that will be hashed")
+    logger.info("Calculating number of files that will be hashed in %s" % target_dir)
 
-    find_cmd = ["find", target_dir, "-type", "f", "-name", f'\"*{file_ext}\"']
-    wc_cmd = ["wc", "-l"]
+    dirpath = resolvepath(target_dir)
+    output = len(fnmatch.filter(os.listdir(dirpath), f"*{file_ext}"))
 
-    find_proc = subprocess.Popen(find_cmd, stdout=subprocess.PIPE)
-    output = subprocess.check_output(wc_cmd, stdin=find_proc.stdout)
-    find_proc.wait()
-
-    output = int(output.decode("utf-8").strip("\n"))
-
-    logger.info("%s files to be hashed" % output)
+    logger.info("%s files to be hashed in %s" % (output, target_dir))
 
     return output
 
@@ -128,6 +134,8 @@ def run_hash(
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
 
+    total_file_num = get_total_number_of_files(dir)
+
     if restart:
         logger.info("Restarting hashing process")
 
@@ -147,7 +155,7 @@ def run_hash(
             un_dict[key] = [value]
 
         pre_hashed_dict = {**dup_dict, **un_dict}
-        files_to_skip = list(chain(*pre_hashed_dict.values()))
+        files_to_skip = [item for values in pre_hashed_dict.values() for item in values]
     else:
         files_to_skip = []
 
@@ -159,7 +167,7 @@ def run_hash(
     else:
         hashes = defaultdict(list)  # Empty dict to store hashes in
 
-    total = 10410200 - len(files_to_skip)
+    total = total_file_num - len(files_to_skip)
     pbar = tqdm(total=total)
 
     for dirName, _, fileList in os.walk(dir):
