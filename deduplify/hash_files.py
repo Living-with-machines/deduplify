@@ -154,7 +154,7 @@ def run_hash(
     logger.info("Generating MD5 hashes for files...")
     # counter = 0
     if restart:
-        hashes = pre_hashed_dict.copy()
+        hashes = defaultdict(lambda: None, pre_hashed_dict)
     else:
         hashes = defaultdict(list)  # Empty dict to store hashes in
 
@@ -171,6 +171,13 @@ def run_hash(
                 hash, filepath = future.result()
                 hashes[hash].append(filepath)
 
+                dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
+
+                for filename, content in zip([dupfile, unfile], [dup_dict, unique_dict]):
+                    logger.info("Writing outputs to: %s" % filename)
+                    with open(filename, "w") as f:
+                        json.dump(content, f, indent=2, sort_keys=True)
+
                 # counter += 1
                 # print(f"Total files hashed: {counter}", end="\r")
                 # sys.stdout.flush()
@@ -178,10 +185,3 @@ def run_hash(
                 pbar.update(1)
 
     pbar.close()
-
-    dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
-
-    for filename, content in zip([dupfile, unfile], [dup_dict, unique_dict]):
-        logger.info("Writing outputs to: %s" % filename)
-        with open(filename, "w") as f:
-            json.dump(content, f, indent=2, sort_keys=True)
