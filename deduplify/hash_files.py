@@ -100,6 +100,8 @@ def run_hash(
         raise ValueError("Please provide a known filepath!")
 
     if restart:
+        logger.info("Restarting hashing process")
+
         for input_file in [dupfile, unfile]:
             if not os.path.isfile(input_file):
                 raise FileNotFoundError(
