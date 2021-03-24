@@ -12,9 +12,7 @@ def test_filter_dict():
 
 
 def test_get_total_number_of_files():
-    ABSOLUTE_HERE = os.path.dirname(os.path.realpath(__file__))
-    HERE = "/".join(ABSOLUTE_HERE.split("/")[:-1])
-    dirpath = os.path.join(HERE, "tests", "testdir")
+    dirpath = os.path.join("tests", "testdir")
 
     output1 = get_total_number_of_files(dirpath)
     output2 = get_total_number_of_files(dirpath, file_ext=".txt")
