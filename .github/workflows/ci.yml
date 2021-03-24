@@ -32,7 +32,7 @@ jobs:
 
       - run: |
           pwd
-          ls -al
+          find . -type f
 
       - name: Run tests
         run: |
