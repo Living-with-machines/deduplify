@@ -167,7 +167,9 @@ def run_hash(
 
                 dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
 
-                for filename, content in zip([dupfile, unfile], [dup_dict, unique_dict]):
+                for filename, content in zip(
+                    [dupfile, unfile], [dup_dict, unique_dict]
+                ):
                     logger.info("Writing outputs to: %s" % filename)
                     with open(filename, "w") as f:
                         json.dump(content, f, indent=2, sort_keys=True)

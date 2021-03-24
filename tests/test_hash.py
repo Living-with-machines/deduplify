@@ -26,5 +26,5 @@ def test_hashfile():
 
     md5_hash, outpath = hashfile(path)
 
-    assert md5_hash == 'f3fb257d843b252bdc0442402552d840'
+    assert md5_hash == "f3fb257d843b252bdc0442402552d840"
     assert outpath == path
