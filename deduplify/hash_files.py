@@ -21,18 +21,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 logger = logging.getLogger()
 
 
-def resolvepath(path):
-    """Resolve and normalize a path
-
-    1.  Handle tilde expansion; turn ~/.ssh into /home/user/.ssh and
-        ~otheruser/bin to /home/otheruser/bin
-    2.  Normalize the path so that it doesn't contain relative segments, turning
-        e.g. /usr/local/../bin to /usr/bin
-    3.  Get the real path of the actual file, resolving symbolic links
-    """
-    return os.path.realpath(os.path.normpath(os.path.expanduser(path)))
-
-
 def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
     """Count the total number of files of a given extension in a directory.
 
@@ -46,8 +34,7 @@ def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
     """
     logger.info("Calculating number of files that will be hashed in %s" % target_dir)
 
-    dirpath = resolvepath(target_dir)
-    output = len(fnmatch.filter(os.listdir(dirpath), f"*{file_ext}"))
+    output = len(fnmatch.filter(os.listdir(target_dir), f"*{file_ext}"))
 
     logger.info("%s files to be hashed in %s" % (output, target_dir))
 

@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 import argparse
@@ -28,6 +29,18 @@ def setup_logging(verbose=False):
         )
 
 
+def resolvepath(path):
+    """Resolve and normalize a path
+
+    1.  Handle tilde expansion; turn ~/.ssh into /home/user/.ssh and
+        ~otheruser/bin to /home/otheruser/bin
+    2.  Normalize the path so that it doesn't contain relative segments, turning
+        e.g. /usr/local/../bin to /usr/bin
+    3.  Get the real path of the actual file, resolving symbolic links
+    """
+    return os.path.realpath(os.path.normpath(os.path.expanduser(path)))
+
+
 def parse_args(args):
     parser = argparse.ArgumentParser(
         description="Find and delete duplicated files in messy datasets"
@@ -56,7 +69,7 @@ def parse_args(args):
     # Positional parser
     parser_pos = argparse.ArgumentParser(add_help=False)
     parser_pos.add_argument(
-        "dir", type=str, help="Path to directory to begin search from"
+        "dir", type=resolvepath, help="Path to directory to begin search from"
     )
 
     # Hash subcommand
@@ -70,7 +83,7 @@ def parse_args(args):
     parser_hash.add_argument(
         "-d",
         "--dupfile",
-        type=str,
+        type=resolvepath,
         dest="dupfile",
         default="duplicates.json",
         help="Destination file for duplicated hashes. Must be a JSON file. Default: duplicates.json",
@@ -78,7 +91,7 @@ def parse_args(args):
     parser_hash.add_argument(
         "-u",
         "--unfile",
-        type=str,
+        type=resolvepath,
         dest="unfile",
         default="uniques.json",
         help="Destination file for unique hashes. Must be a JSON file. Default: uniques.json",
@@ -100,7 +113,7 @@ def parse_args(args):
     parser_compare.add_argument(
         "-i",
         "--infile",
-        type=str,
+        type=resolvepath,
         default="duplicates.json",
         help="Filename to analyse. Must be a JSON file. Default: duplicates.json",
     )
