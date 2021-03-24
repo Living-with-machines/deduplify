@@ -100,6 +100,50 @@ def filter_dict(results: dict) -> Tuple[dict, dict]:
     return duplicated, unique
 
 
+def transform_dict(input_dict: dict) -> dict:
+    """Transforms a dictionary with str type values into one with list type
+    values
+
+    Args:
+        input_dict (dict): of type {key: str}
+
+    Returns:
+        dict: of type {key: [str]}
+    """
+    output_dict = {key: [value] for (key, value) in input_dict.items()}
+    return output_dict
+
+
+def restart_run(dupfile: os.path, unfile: os.path) -> Tuple[dict, list]:
+    """When restarting a hash run, read in and wrangle the previous output files
+    to reconstruct the dictionary and identify which files need to be skipped
+
+    Args:
+        dupfile (os.path): Path the the file containing duplicated hashes and filenames
+        unfile (os.path): Path to the file containing unique hashes and filenames
+    """
+    logger.info("Restarting hashing process")
+    logger.info("Checking required files exist")
+    for filename in [dupfile, unfile]:
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"{filename} must exist to restart a hash run!")
+
+    logger.info("Reading in files")
+    with open(dupfile) as stream:
+        dup_dict = json.load(stream)
+    with open(unfile) as stream:
+        un_dict = json.load(stream)
+
+    un_dict = transform_dict(un_dict)
+
+    pre_hashed_dict = {**dup_dict, **un_dict}
+    hashes = defaultdict(list, pre_hashed_dict)
+
+    files_to_skip = [item for values in pre_hashed_dict.values() for item in values]
+
+    return hashes, files_to_skip
+
+
 def run_hash(
     dir: str, count: int, dupfile: str, unfile: str, restart: bool = False, **kwargs
 ):
@@ -121,35 +165,13 @@ def run_hash(
     total_file_num = get_total_number_of_files(dir)
 
     if restart:
-        logger.info("Restarting hashing process")
-
-        for input_file in [dupfile, unfile]:
-            if not os.path.isfile(input_file):
-                raise FileNotFoundError(
-                    f"{input_file} must exist to restart a hash run!"
-                )
-
-        with open(dupfile) as stream:
-            dup_dict = json.load(stream)
-
-        with open(unfile) as stream:
-            un_dict = json.load(stream)
-
-        for key, value in un_dict.items():
-            un_dict[key] = [value]
-
-        pre_hashed_dict = {**dup_dict, **un_dict}
-        files_to_skip = [item for values in pre_hashed_dict.values() for item in values]
+        hashes, files_to_skip = restart_run(dupfile, unfile)
     else:
+        hashes = defaultdict(list)  # Empty dict to store hashes in
         files_to_skip = []
 
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
-
-    if restart:
-        hashes = defaultdict(list, pre_hashed_dict)
-    else:
-        hashes = defaultdict(list)  # Empty dict to store hashes in
 
     total = total_file_num - len(files_to_skip)
     pbar = tqdm(total=total)
