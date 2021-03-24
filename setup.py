@@ -75,5 +75,6 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     use_incremental=True,
-    setup_requires=["incremental"],
+    setup_requires=["incremental", "pytest-runner"],
+    tests_require=test_require,
 )
