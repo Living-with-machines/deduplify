@@ -8,8 +8,6 @@ together files that have generated the same hash.
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
-# import sys
-
 import os
 import json
 import hashlib
@@ -17,7 +15,6 @@ import logging
 import fnmatch
 from tqdm import tqdm
 from typing import Tuple
-from itertools import chain
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -161,7 +158,7 @@ def run_hash(
 
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
-    # counter = 0
+
     if restart:
         hashes = defaultdict(list, pre_hashed_dict)
     else:
@@ -187,10 +184,6 @@ def run_hash(
                     logger.info("Writing outputs to: %s" % filename)
                     with open(filename, "w") as f:
                         json.dump(content, f, indent=2, sort_keys=True)
-
-                # counter += 1
-                # print(f"Total files hashed: {counter}", end="\r")
-                # sys.stdout.flush()
 
                 pbar.update(1)
 
