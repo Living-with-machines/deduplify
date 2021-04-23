@@ -77,7 +77,7 @@ This file is organised such that the keys are the hashes and the values are a **
 **Command line usage:**
 
 ```bash
-usage: deduplify hash [-h] [-c COUNT] [-v] [-d DUPFILE] [-u UNFILE] dir
+usage: deduplify hash [-h] [-c COUNT] [-v] [-d DUPFILE] [-u UNFILE] [--restart] dir
 
 positional arguments:
   dir                   Path to directory to begin search from
@@ -91,6 +91,7 @@ optional arguments:
                         Destination file for duplicated hashes. Must be a JSON file. Default: duplicates.json
   -u UNFILE, --unfile UNFILE
                         Destination file for unique hashes. Must be a JSON file. Default: uniques.json
+  --restart             Restart a run of hashing files and skip over files that have already been hashed. Output files containing duplicated and unique filenames must already exist.
 ```
 
 ### Comparing files
