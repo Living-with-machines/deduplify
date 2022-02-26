@@ -7,5 +7,5 @@ Provides deduplify version information.
 
 from incremental import Version
 
-__version__ = Version("deduplify", 0, 1, 4)
+__version__ = Version("deduplify", 0, 1, 5)
 __all__ = ["__version__"]

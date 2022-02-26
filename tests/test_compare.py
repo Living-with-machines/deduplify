@@ -28,6 +28,18 @@ def test_compare_filenames():
     assert out_file_list == ["different/path/to/test/file.txt"]
 
 
+def test_compare_filenames_same_length():
+    test_file_list = [
+        "path/to/test/file.txt",
+        "diff/xy/path/file.txt",
+    ]
+
+    out_file_list = compare_filenames(test_file_list)
+
+    assert len(out_file_list) == 1
+    assert out_file_list == ["path/to/test/file.txt"]
+
+
 @patch("deduplify.compare_files.os.remove")
 def test_delete_files(mock):
     test_files = ["path/to/file_1.txt", "path/to/file_2.txt"]
