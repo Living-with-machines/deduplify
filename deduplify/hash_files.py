@@ -8,7 +8,7 @@ together files that have generated the same hash.
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
-
+import fnmatch
 import hashlib
 import json
 import logging
@@ -18,8 +18,30 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
 
+from tqdm import tqdm
+
 logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
+
+
+def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
+    """Count the total number of files of a given extension in a directory.
+
+    Args:
+        target_dir (str): The target directory to search.
+        file_ext (str): The file extension to search for. Default: .xml
+
+    Returns:
+        int: The number of files with the matching extension within the tree
+            of the target directory
+    """
+    logger.info("Calculating number of files that will be hashed in %s" % target_dir)
+
+    output = len(fnmatch.filter(os.listdir(target_dir), f"*{file_ext}"))
+
+    logger.info(f"{output} files to be hashed in {target_dir}")
+
+    return output
 
 
 def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
@@ -76,12 +98,58 @@ def filter_dict(results: dict) -> Tuple[dict, dict]:
     for value in duplicated.values():
         total += len(value)
 
-    logger.info("Number of identical files: %s" % total)
+    logger.info("Number of duplicated files: %s" % total)
 
     return duplicated, unique
 
 
-def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
+def transform_dict(input_dict: dict) -> dict:
+    """Transforms a dictionary with str type values into one with list type
+    values
+
+    Args:
+        input_dict (dict): of type {key: str}
+
+    Returns:
+        dict: of type {key: [str]}
+    """
+    output_dict = {key: [value] for (key, value) in input_dict.items()}
+    return output_dict
+
+
+def restart_run(dupfile: os.path, unfile: os.path) -> Tuple[dict, list]:
+    """When restarting a hash run, read in and wrangle the previous output files
+    to reconstruct the dictionary and identify which files need to be skipped
+
+    Args:
+        dupfile (os.path): Path the the file containing duplicated hashes and filenames
+        unfile (os.path): Path to the file containing unique hashes and filenames
+    """
+    logger.info("Restarting hashing process")
+    logger.info("Checking required files exist")
+    for filename in [dupfile, unfile]:
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"{filename} must exist to restart a hash run!")
+
+    logger.info("Reading in files")
+    with open(dupfile) as stream:
+        dup_dict = json.load(stream)
+    with open(unfile) as stream:
+        un_dict = json.load(stream)
+
+    un_dict = transform_dict(un_dict)
+
+    pre_hashed_dict = {**dup_dict, **un_dict}
+    hashes = defaultdict(list, pre_hashed_dict)
+
+    files_to_skip = [item for values in pre_hashed_dict.values() for item in values]
+
+    return hashes, files_to_skip
+
+
+def run_hash(
+    dir: str, count: int, dupfile: str, unfile: str, restart: bool = False, **kwargs
+):
     """Hash files within a directory structure
 
     Args:
@@ -89,29 +157,42 @@ def run_hash(dir: str, count: int, dupfile: str, unfile: str, **kwargs):
         count (int): Number of threads to parallelise over
         dupfile (str): JSON file location for duplicated hashes
         unfile (str): JSON file location for unique hashes
+        restart (bool): If true, will restart a hash run. dupfile and unfile
+            must exist since the filenames already hashed will be skipped.
+            Default: False.
     """
     # Check the directory path exists
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
 
+    total_file_num = get_total_number_of_files(dir)
+
+    if restart:
+        hashes, files_to_skip = restart_run(dupfile, unfile)
+    else:
+        hashes = defaultdict(list)  # Empty dict to store hashes in
+        files_to_skip = []
+
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
-    hashes = defaultdict(list)  # Empty dict to store hashes in
-    counter = 0
 
-    for dirName, subdirs, fileList in os.walk(dir):
+    total = total_file_num - len(files_to_skip)
+    pbar = tqdm(total=total)
+
+    for dirName, _, fileList in os.walk(dir):
         with ThreadPoolExecutor(max_workers=count) as executor:
             futures = [
                 executor.submit(hashfile, os.path.join(dirName, filename))
                 for filename in fileList
+                if filename not in files_to_skip
             ]
             for future in as_completed(futures):
                 hash, filepath = future.result()
                 hashes[hash].append(filepath)
 
-                counter += 1
-                print(f"Total files hashed: {counter}", end="\r")
-                sys.stdout.flush()
+                pbar.update(1)
+
+    pbar.close()
 
     dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
 

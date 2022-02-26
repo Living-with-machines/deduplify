@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import sys
 from multiprocessing import cpu_count
 
@@ -26,6 +27,18 @@ def setup_logging(verbose=False):
             format="[%(asctime)s %(levelname)s] %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
         )
+
+
+def resolvepath(path):
+    """Resolve and normalize a path
+
+    1.  Handle tilde expansion; turn ~/.ssh into /home/user/.ssh and
+        ~otheruser/bin to /home/otheruser/bin
+    2.  Normalize the path so that it doesn't contain relative segments, turning
+        e.g. /usr/local/../bin to /usr/bin
+    3.  Get the real path of the actual file, resolving symbolic links
+    """
+    return os.path.realpath(os.path.normpath(os.path.expanduser(path)))
 
 
 def parse_args(args):
@@ -56,7 +69,7 @@ def parse_args(args):
     # Positional parser
     parser_pos = argparse.ArgumentParser(add_help=False)
     parser_pos.add_argument(
-        "dir", type=str, help="Path to directory to begin search from"
+        "dir", type=resolvepath, help="Path to directory to begin search from"
     )
 
     # Hash subcommand
@@ -70,7 +83,7 @@ def parse_args(args):
     parser_hash.add_argument(
         "-d",
         "--dupfile",
-        type=str,
+        type=resolvepath,
         dest="dupfile",
         default="duplicates.json",
         help="Destination file for duplicated hashes. Must be a JSON file. Default: duplicates.json",
@@ -78,10 +91,15 @@ def parse_args(args):
     parser_hash.add_argument(
         "-u",
         "--unfile",
-        type=str,
+        type=resolvepath,
         dest="unfile",
         default="uniques.json",
         help="Destination file for unique hashes. Must be a JSON file. Default: uniques.json",
+    )
+    parser_hash.add_argument(
+        "--restart",
+        action="store_true",
+        help="Restart a run of hashing files and skip over files that have already been hashed. Output files containing duplicated and unique filenames must already exist.",
     )
 
     # Compare subcommand
@@ -95,7 +113,7 @@ def parse_args(args):
     parser_compare.add_argument(
         "-i",
         "--infile",
-        type=str,
+        type=resolvepath,
         default="duplicates.json",
         help="Filename to analyse. Must be a JSON file. Default: duplicates.json",
     )
