@@ -9,14 +9,14 @@ Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
 
+import hashlib
+import json
+import logging
 import os
 import sys
-import json
-import hashlib
-import logging
-from typing import Tuple
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Tuple
 
 logger = logging.getLogger()
 

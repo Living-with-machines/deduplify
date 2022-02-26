@@ -8,9 +8,9 @@ Author: Sarah Gibson
 Python version: >= 3.7 (developed with 3.8)
 """
 
+import logging
 import os
 import sys
-import logging
 
 logger = logging.getLogger()
 

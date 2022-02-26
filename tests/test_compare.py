@@ -1,8 +1,9 @@
-from unittest.mock import patch, call
+from unittest.mock import call, patch
+
 from deduplify.compare_files import (
-    filter_by_length,
     compare_filenames,
     delete_files,
+    filter_by_length,
     run_compare,
 )
 
