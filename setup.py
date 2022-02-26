@@ -10,7 +10,7 @@ AUTHOR = "Sarah Gibson"
 DESCRIPTION = (
     "A Python package to search for and remove duplicated files in messy datasets"
 )
-EMAIL = "sgibson@turing.ac.uk"
+EMAIL = "drsarahlgibson@gmail.com"
 LICENSE = "MIT"
 LICENSE_TROVE = "License :: OSI Approved :: MIT License"
 NAME = "deduplify"
@@ -22,11 +22,14 @@ VERSION = None
 with open(os.path.join(here, "requirements.txt")) as f:
     required = [line.strip("\n") for line in f.readlines()]
 
-REQUIRED = required + ["incremental"]
+with open(os.path.join(here, "dev-requirements.txt")) as f:
+    test_required = [line.strip("\n") for line in f.readlines()]
+
+REQUIRED = required
 full_require = []
 docs_require = []
-test_require = full_require + ["pytest", "coverage"]
-dev_require = ["incremental"]
+test_require = full_require + test_required
+dev_require = []
 
 # What packages are optional?
 EXTRAS = {
