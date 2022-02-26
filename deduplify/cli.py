@@ -79,20 +79,12 @@ def parse_args(args):
     parser_hash.set_defaults(func=run_hash)
 
     parser_hash.add_argument(
-        "-d",
-        "--dupfile",
+        "-f",
+        "--dbfile",
         type=resolvepath,
-        dest="dupfile",
-        default="duplicates.json",
-        help="Destination database for duplicated hashes. Must be a JSON file. Default: duplicates.json",
-    )
-    parser_hash.add_argument(
-        "-u",
-        "--unfile",
-        type=resolvepath,
-        dest="unfile",
-        default="uniques.json",
-        help="Destination database for unique hashes. Must be a JSON file. Default: uniques.json",
+        dest="dbfile",
+        default="file_hashes.json",
+        help="Destination database for file hashes. Must be a JSON file. Default: file_hashes.json",
     )
     parser_hash.add_argument(
         "--restart",
@@ -109,11 +101,11 @@ def parse_args(args):
     parser_compare.set_defaults(func=run_compare)
 
     parser_compare.add_argument(
-        "-i",
+        "-f",
         "--infile",
         type=resolvepath,
-        default="duplicates.json",
-        help="Database to analyse. Must be a JSON file. Default: duplicates.json",
+        default="file_hashes.json",
+        help="Database to analyse. Must be a JSON file. Default: file_hashes.json",
     )
     parser_compare.add_argument(
         "--purge", action="store_true", help="Deletes duplicated files. Default: False"
@@ -133,7 +125,7 @@ def parse_args(args):
 def main():
     args = parse_args(sys.argv[1:])
 
-    for file_arg in ["infile", "dupfile", "unfile"]:
+    for file_arg in ["infile", "dbfile"]:
         if (file_arg in vars(args).keys()) and not (
             vars(args)[file_arg].endswith(".json")
         ):
