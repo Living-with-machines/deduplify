@@ -1,3 +1,6 @@
+# Ignore JSON output files
+**/*.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -127,7 +130,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# Ignore JSON output files
-**/duplicates.json
-**/uniques.json
