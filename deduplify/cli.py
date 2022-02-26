@@ -131,6 +131,15 @@ def main():
         ):
             raise ValueError("Please provide a JSON input file!")
 
+    if (args.command == "hash") and os.path.exists(args.dbfile) and not args.restart:
+        logging.warn("Starting a new run, deleting old database: %s" % args.dbfile)
+        os.remove(args.dbfile)
+    elif (args.command == "hash") and args.restart and not os.path.exists(args.dbfile):
+        raise FileNotFoundError(
+            "Trying to restart a run but cannot find the database file! "
+            + f"Is the filepath correct? {args.dbfile}"
+        )
+
     if args.count > CPUS:
         raise ValueError(
             "You have requested more threads than are available to this machine. "
