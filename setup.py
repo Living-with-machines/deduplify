@@ -19,7 +19,7 @@ URL = "https://github.com/Living-with-Machines/deduplify"
 VERSION = None
 
 # What packages are required for this module to be executed?
-with open(os.path.join(here, "requirements.txt"), "r") as f:
+with open(os.path.join(here, "requirements.txt")) as f:
     required = [line.strip("\n") for line in f.readlines()]
 
 REQUIRED = required + ["incremental"]
@@ -44,7 +44,7 @@ EXTRAS = {
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
 try:
-    with io.open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+    with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
         long_description = "\n" + f.read()
 except FileNotFoundError:
     long_description = DESCRIPTION

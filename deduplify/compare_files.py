@@ -13,13 +13,14 @@ Packages: tqdm
 >>> pip install tqdm
 """
 
-import os
-import sys
 import json
 import logging
-from tqdm import tqdm
+import os
+import sys
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from tqdm import tqdm
 
 logger = logging.getLogger()
 
@@ -100,7 +101,7 @@ def run_compare(infile: str, purge: bool, count: int, **kwargs):
     """
     # Load the file into a dictionary
     logger.info("Loading in file: %s" % infile)
-    with open(infile, "r") as stream:
+    with open(infile) as stream:
         files = json.load(stream)
     logger.info("Done!")
 

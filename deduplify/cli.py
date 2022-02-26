@@ -1,11 +1,11 @@
-import sys
-import logging
 import argparse
+import logging
+import sys
 from multiprocessing import cpu_count
 
-from .hash_files import run_hash
 from .compare_files import run_compare
 from .del_empty_dirs import empty_dir_search
+from .hash_files import run_hash
 
 CPUS = cpu_count()
 

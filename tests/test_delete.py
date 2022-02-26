@@ -1,5 +1,6 @@
 import os
-from unittest.mock import patch, call
+from unittest.mock import call, patch
+
 from deduplify.del_empty_dirs import empty_dir_search
 
 
