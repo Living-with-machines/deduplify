@@ -1,3 +1,4 @@
 incremental
+tinydb==4.7.0
 tqdm
 twisted
