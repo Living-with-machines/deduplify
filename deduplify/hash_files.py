@@ -24,12 +24,12 @@ logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
 
 
-def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
+def get_total_number_of_files(target_dir: str, file_ext: str = "*") -> int:
     """Count the total number of files of a given extension in a directory.
 
     Args:
         target_dir (str): The target directory to search.
-        file_ext (str): The file extension to search for. Default: .xml
+        file_ext (str): The file extension to search for. Default: all extensions.
 
     Returns:
         int: The number of files with the matching extension within the tree
@@ -37,7 +37,7 @@ def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
     """
     logger.info("Calculating number of files that will be hashed in %s" % target_dir)
 
-    output = len(fnmatch.filter(os.listdir(target_dir), f"*{file_ext}"))
+    output = len(fnmatch.filter(os.listdir(target_dir), f"*.{file_ext}"))
 
     logger.info(f"{output} files to be hashed in {target_dir}")
 
