@@ -13,12 +13,12 @@ import hashlib
 import json
 import logging
 import os
-import sys
-from collections import defaultdict
+from collections import defaultdict, Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
 
 from tqdm import tqdm
+from tinydb import TinyDB, where
 
 logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
@@ -138,15 +138,14 @@ def restart_run(dupfile: os.path, unfile: os.path) -> Tuple[dict, list]:
 
 
 def run_hash(
-    dir: str, count: int, dupfile: str, unfile: str, restart: bool = False, **kwargs
+    dir: str, count: int, dbfile: str, restart: bool = False, **kwargs
 ):
     """Hash files within a directory structure
 
     Args:
         dir (str): Root directory to search under
         count (int): Number of threads to parallelise over
-        dupfile (str): JSON file location for duplicated hashes
-        unfile (str): JSON file location for unique hashes
+        dbfile (str): JSON file location for the file hashes database
         restart (bool): If true, will restart a hash run. dupfile and unfile
             must exist since the filenames already hashed will be skipped.
             Default: False.
@@ -155,13 +154,17 @@ def run_hash(
     if not os.path.exists(dir):
         raise ValueError("Please provide a known filepath!")
 
+    hashes_db = TinyDB(dbfile)
+
     total_file_num = get_total_number_of_files(dir)
 
-    if restart:
-        hashes, files_to_skip = restart_run(dupfile, unfile)
-    else:
-        hashes = defaultdict(list)  # Empty dict to store hashes in
-        files_to_skip = []
+    # if restart:
+    #     hashes, files_to_skip = restart_run(dupfile, unfile)
+    # else:
+    #     hashes = defaultdict(list)  # Empty dict to store hashes in
+    #     files_to_skip = []
+
+    files_to_skip = []
 
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
@@ -178,15 +181,10 @@ def run_hash(
             ]
             for future in as_completed(futures):
                 hash, filepath = future.result()
-                hashes[hash].append(filepath)
+                hashes_db.insert({"hash": hash, "filepath": filepath})
 
                 pbar.update(1)
 
     pbar.close()
 
-    dup_dict, unique_dict = filter_dict(hashes)  # Filter the results
-
-    for filename, content in zip([dupfile, unfile], [dup_dict, unique_dict]):
-        logger.info("Writing outputs to: %s" % filename)
-        with open(filename, "w") as f:
-            json.dump(content, f, indent=2, sort_keys=True)
+    hashes_db = identify_duplicates(hashes_db)  # Filter the results
