@@ -32,13 +32,11 @@ def setup_logging(verbose=False):
 def resolvepath(path):
     """Resolve and normalize a path
 
-    1.  Handle tilde expansion; turn ~/.ssh into /home/user/.ssh and
-        ~otheruser/bin to /home/otheruser/bin
-    2.  Normalize the path so that it doesn't contain relative segments, turning
+    1.  Normalize the path so that it doesn't contain relative segments, turning
         e.g. /usr/local/../bin to /usr/bin
-    3.  Get the real path of the actual file, resolving symbolic links
+    2.  Get the real path of the actual file, resolving symbolic links
     """
-    return os.path.realpath(os.path.normpath(os.path.expanduser(path)))
+    return os.path.realpath(os.path.normpath(path))
 
 
 def parse_args(args):
@@ -86,7 +84,7 @@ def parse_args(args):
         type=resolvepath,
         dest="dupfile",
         default="duplicates.json",
-        help="Destination file for duplicated hashes. Must be a JSON file. Default: duplicates.json",
+        help="Destination database for duplicated hashes. Must be a JSON file. Default: duplicates.json",
     )
     parser_hash.add_argument(
         "-u",
@@ -94,7 +92,7 @@ def parse_args(args):
         type=resolvepath,
         dest="unfile",
         default="uniques.json",
-        help="Destination file for unique hashes. Must be a JSON file. Default: uniques.json",
+        help="Destination database for unique hashes. Must be a JSON file. Default: uniques.json",
     )
     parser_hash.add_argument(
         "--restart",
@@ -115,7 +113,7 @@ def parse_args(args):
         "--infile",
         type=resolvepath,
         default="duplicates.json",
-        help="Filename to analyse. Must be a JSON file. Default: duplicates.json",
+        help="Database to analyse. Must be a JSON file. Default: duplicates.json",
     )
     parser_compare.add_argument(
         "--purge", action="store_true", help="Deletes duplicated files. Default: False"

@@ -48,9 +48,8 @@ def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
     """Calculate the MD5 hash of a given file
 
     Args:
-        path ()str, os.path): Path to the file to generate a hash for
-        blocksize (int, optional): Memory size to read in the file
-                                   Default: 65536
+        path (str, os.path): Path to the file to generate a hash for
+        blocksize (int, optional): Memory size to read in the file. Default: 65536.
 
     Returns:
         hash (str): The HEX digest hash of the given file
@@ -83,9 +82,9 @@ def filter_dict(results: dict) -> Tuple[dict, dict]:
 
     Results:
         duplicated (dict): Dictionary where len(values) > 1. Considered to be
-                           duplicated hashes.
+            duplicated hashes.
         unique (dict): Dictionary where len(values) == 1. Considered to be
-                       unique hashes.
+            unique hashes.
     """
     logger.info("Filtering the results...")
     duplicated = {key: value for (key, value) in results.items() if len(value) > 1}

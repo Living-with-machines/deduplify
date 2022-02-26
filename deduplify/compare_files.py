@@ -54,8 +54,8 @@ def compare_filenames(file_list: list) -> str:
 
     Returns:
         file_list (list): In the case when filenames are identical, the
-                          shortest filepath is removed from the list and the
-                          rest are returned to be deleted.
+            shortest filepath is removed from the list and the rest are returned to be
+            deleted.
     """
     file_list.sort()  # Sort the list of filepaths alphabetically
     filenames = [
