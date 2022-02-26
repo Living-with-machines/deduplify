@@ -2,7 +2,7 @@ name: Publish deduplify to PyPI
 
 on:
   release:
-    - published
+    types: [published]
 
 jobs:
   publish-pypi:
