@@ -72,48 +72,39 @@ def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
     return hasher.hexdigest(), path.replace(EXPANDED_USER, "~")
 
 
-def filter_dict(results: dict) -> Tuple[dict, dict]:
-    """Filter a given dictionary into two separate dictionaries based on the
-    conditional that the length of the values is either greater than or equal
-    to unity.
+def identify_duplicates(db):
+    """Identify duplicated documents in a given TinyDB database based on the whether
+    the hash key in each document is unique in the whole database.
 
     Args:
-        results (dict): Dictionary to be filtered
-
-    Results:
-        duplicated (dict): Dictionary where len(values) > 1. Considered to be
-            duplicated hashes.
-        unique (dict): Dictionary where len(values) == 1. Considered to be
-            unique hashes.
-    """
-    logger.info("Filtering the results...")
-    duplicated = {key: value for (key, value) in results.items() if len(value) > 1}
-    unique = {key: value[0] for (key, value) in results.items() if len(value) == 1}
-
-    # Calculate number of unique and duplicated files
-    logger.info("Number of unique files: %s" % len(unique))
-
-    total = 0
-    for value in duplicated.values():
-        total += len(value)
-
-    logger.info("Number of duplicated files: %s" % total)
-
-    return duplicated, unique
-
-
-def transform_dict(input_dict: dict) -> dict:
-    """Transforms a dictionary with str type values into one with list type
-    values
-
-    Args:
-        input_dict (dict): of type {key: str}
+        db (TinyDB database): The TinyDB database object to be filtered
 
     Returns:
-        dict: of type {key: [str]}
+        db (TinyDB database): The database updated with the "duplicate" key
+            containing a Boolean value indicating if the file has a duplicate or not.
     """
-    output_dict = {key: [value] for (key, value) in input_dict.items()}
-    return output_dict
+    logger.info("Filtering the results...")
+
+    all_rows = db.all()
+    all_hashes = [row["hash"] for row in all_rows]
+    counted_hashes = Counter(all_hashes)
+
+    # Add duplicate key to each document in the database indicating
+    # whether it is a duplicate or not
+    for k, v in counted_hashes.items():
+        if v == 1:
+            db.update({"duplicate": False}, where("hash") == k)
+        elif v > 1:
+            db.update({"duplicate": True}, where("hash") == k)
+
+    # Calculate number of unique and duplicated files
+    unique = db.search(where("duplicate") == False)
+    logger.info("Number of unique files: %s" % len(unique))
+
+    duplicates = db.search(where("duplicate") == True)
+    logger.info("Number of duplicated files: %s" % len(duplicates))
+
+    return db
 
 
 def restart_run(dupfile: os.path, unfile: os.path) -> Tuple[dict, list]:
