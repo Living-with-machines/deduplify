@@ -10,10 +10,9 @@ Python version: >=3.7 (developed with 3.8, tested with 3.6 -> 3.10)
 """
 import fnmatch
 import hashlib
-import json
 import logging
 import os
-from collections import defaultdict, Counter
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
 
