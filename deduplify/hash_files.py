@@ -107,34 +107,16 @@ def identify_duplicates(db):
     return db
 
 
-def restart_run(dupfile: os.path, unfile: os.path) -> Tuple[dict, list]:
-    """When restarting a hash run, read in and wrangle the previous output files
-    to reconstruct the dictionary and identify which files need to be skipped
+def restart_run(db) -> list:
+    """When restarting a hash run, identify which files need to be skipped from the
+    database
 
     Args:
-        dupfile (os.path): Path the the file containing duplicated hashes and filenames
-        unfile (os.path): Path to the file containing unique hashes and filenames
+        db (TinyDB database): A TinyDB database objects containing filepaths and hashes
+            of the search so far
     """
     logger.info("Restarting hashing process")
-    logger.info("Checking required files exist")
-    for filename in [dupfile, unfile]:
-        if not os.path.exists(filename):
-            raise FileNotFoundError(f"{filename} must exist to restart a hash run!")
-
-    logger.info("Reading in files")
-    with open(dupfile) as stream:
-        dup_dict = json.load(stream)
-    with open(unfile) as stream:
-        un_dict = json.load(stream)
-
-    un_dict = transform_dict(un_dict)
-
-    pre_hashed_dict = {**dup_dict, **un_dict}
-    hashes = defaultdict(list, pre_hashed_dict)
-
-    files_to_skip = [item for values in pre_hashed_dict.values() for item in values]
-
-    return hashes, files_to_skip
+    return [os.path.basename(row["filepath"]) for row in db.all()]
 
 
 def run_hash(
@@ -158,13 +140,10 @@ def run_hash(
 
     total_file_num = get_total_number_of_files(dir)
 
-    # if restart:
-    #     hashes, files_to_skip = restart_run(dupfile, unfile)
-    # else:
-    #     hashes = defaultdict(list)  # Empty dict to store hashes in
-    #     files_to_skip = []
-
-    files_to_skip = []
+    if restart:
+        files_to_skip = restart_run(hashes_db)
+    else:
+        files_to_skip = []
 
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
@@ -187,4 +166,4 @@ def run_hash(
 
     pbar.close()
 
-    hashes_db = identify_duplicates(hashes_db)  # Filter the results
+    hashes_db = identify_duplicates(hashes_db)
