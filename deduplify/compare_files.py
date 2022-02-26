@@ -63,8 +63,6 @@ def compare_filenames(file_list: list) -> str:
     ]  # Get the filenames
     name_freq = Counter(filenames)  # Count the frequency of the filenames
 
-    # TODO: #20 Update to handle cases where the length of the filenames are equivalent
-    # but they are different filenames.
     if len(name_freq) == 1:
         file_list.remove(min(file_list, key=len))
         return file_list
