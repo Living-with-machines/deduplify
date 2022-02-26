@@ -8,17 +8,17 @@ together files that have generated the same hash.
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
-import os
+import fnmatch
 import hashlib
 import json
 import logging
-import fnmatch
-from tqdm import tqdm
-from typing import Tuple
+import os
 import sys
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
+
+from tqdm import tqdm
 
 logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
@@ -39,7 +39,7 @@ def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
 
     output = len(fnmatch.filter(os.listdir(target_dir), f"*{file_ext}"))
 
-    logger.info("%s files to be hashed in %s" % (output, target_dir))
+    logger.info(f"{output} files to be hashed in {target_dir}")
 
     return output
 

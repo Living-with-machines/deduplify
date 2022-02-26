@@ -1,11 +1,12 @@
 import os
 from collections import defaultdict
+
 from deduplify.hash_files import (
     filter_dict,
     get_total_number_of_files,
     hashfile,
-    transform_dict,
     restart_run,
+    transform_dict,
 )
 
 
