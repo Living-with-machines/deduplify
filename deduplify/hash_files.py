@@ -6,7 +6,7 @@ Walk over a directory structure and hash the files within it. Then group
 together files that have generated the same hash.
 
 Author: Sarah Gibson
-Python version: >=3.7 (developed with 3.8)
+Python version: >=3.7 (developed with 3.8, tested with 3.6 -> 3.10)
 """
 import fnmatch
 import hashlib

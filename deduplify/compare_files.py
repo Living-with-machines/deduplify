@@ -7,7 +7,7 @@ thereby being identical beyond reasonable doubt. Requires hash_files.py to
 already have been executed. Using the --purge option will delete the duplicated
 files.
 
-Python version: >= 3.7 (developed with 3.8)
+Python version: >= 3.7 (developed with 3.8, tested with 3.6 -> 3.10)
 Packages: tqdm
 
 >>> pip install tqdm

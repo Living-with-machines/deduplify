@@ -5,7 +5,7 @@ Delete Empty Directories
 Script to search for and delete empty directories.
 
 Author: Sarah Gibson
-Python version: >= 3.7 (developed with 3.8)
+Python version: >= 3.7 (developed with 3.8, tested with 3.6 -> 3.10)
 """
 
 import logging
