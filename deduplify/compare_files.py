@@ -66,6 +66,11 @@ def compare_filenames(file_list: list) -> str:
     if len(name_freq) == 1:
         file_list.remove(min(file_list, key=len))
         return file_list
+    elif (len(name_freq) > 1) and (list(set(file_list)) == 1):
+        # there are multiple filepaths that are different,
+        # but by coincidence have the same length
+        file_list = file_list.sort()
+        file_list.remove(file_list[1:])
     else:
         raise ValueError(
             f"The following filenames need investigation.\n{name_freq}\n{file_list}"
