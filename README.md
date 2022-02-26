@@ -1,7 +1,7 @@
 # deduplify
 
 [![PyPI](https://img.shields.io/pypi/v/deduplify)](https://pypi.org/project/deduplify/)
-[![CI](https://github.com/Living-with-machines/deduplify/workflows/CI/badge.svg)](https://github.com/Living-with-machines/deduplify/actions?query=workflow%3ACI)
+[![CI](https://github.com/Living-with-machines/deduplify/workflows/CI/badge.svg)](https://github.com/Living-with-machines/deduplify/actions?query=workflow%3ACI) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Living-with-machines/deduplify/main.svg)](https://results.pre-commit.ci/latest/github/Living-with-machines/deduplify/main)
 
 A Python tool to search for and remove duplicated files in messy datasets.
 
