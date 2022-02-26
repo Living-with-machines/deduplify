@@ -97,10 +97,10 @@ def identify_duplicates(db):
             db.update({"duplicate": True}, where("hash") == k)
 
     # Calculate number of unique and duplicated files
-    unique = db.search(where("duplicate") == False)
+    unique = db.search(where("duplicate") is False)
     logger.info("Number of unique files: %s" % len(unique))
 
-    duplicates = db.search(where("duplicate") == True)
+    duplicates = db.search(where("duplicate") is True)
     logger.info("Number of duplicated files: %s" % len(duplicates))
 
     return db
