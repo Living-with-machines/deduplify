@@ -9,16 +9,19 @@ Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
 import os
-import json
 import hashlib
+import json
 import logging
 import fnmatch
 from tqdm import tqdm
 from typing import Tuple
+import sys
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Tuple
 
 logger = logging.getLogger()
+EXPANDED_USER = os.path.expanduser("~")
 
 
 def get_total_number_of_files(target_dir: str, file_ext: str = ".xml") -> int:
@@ -67,7 +70,7 @@ def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
 
     f.close()
 
-    return hasher.hexdigest(), path
+    return hasher.hexdigest(), path.replace(EXPANDED_USER, "~")
 
 
 def filter_dict(results: dict) -> Tuple[dict, dict]:

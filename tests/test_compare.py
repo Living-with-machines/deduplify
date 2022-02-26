@@ -1,8 +1,9 @@
-from unittest.mock import patch, call
+from unittest.mock import call, patch
+
 from deduplify.compare_files import (
-    filter_by_length,
     compare_filenames,
     delete_files,
+    filter_by_length,
     run_compare,
 )
 
@@ -25,6 +26,18 @@ def test_compare_filenames():
 
     assert len(out_file_list) == 1
     assert out_file_list == ["different/path/to/test/file.txt"]
+
+
+def test_compare_filenames_same_length():
+    test_file_list = [
+        "path/to/test/file.txt",
+        "diff/xy/path/file.txt",
+    ]
+
+    out_file_list = compare_filenames(test_file_list)
+
+    assert len(out_file_list) == 1
+    assert out_file_list == ["path/to/test/file.txt"]
 
 
 @patch("deduplify.compare_files.os.remove")

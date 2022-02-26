@@ -1,5 +1,5 @@
 ---
-name: "Suport request"
+name: "Support request"
 about: "File a request for support"
 title: ""
 labels: "needs: triage"

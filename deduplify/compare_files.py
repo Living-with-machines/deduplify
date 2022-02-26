@@ -13,13 +13,14 @@ Packages: tqdm
 >>> pip install tqdm
 """
 
-import os
-import sys
 import json
 import logging
-from tqdm import tqdm
+import os
+import sys
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from tqdm import tqdm
 
 logger = logging.getLogger()
 
@@ -67,6 +68,11 @@ def compare_filenames(file_list: list) -> str:
     if len(name_freq) == 1:
         file_list.remove(min(file_list, key=len))
         return file_list
+    elif (len(name_freq) > 1) and (list(set(file_list)) == 1):
+        # there are multiple filepaths that are different,
+        # but by coincidence have the same length
+        file_list = file_list.sort()
+        file_list.remove(file_list[1:])
     else:
         raise ValueError(
             f"The following filenames need investigation.\n{name_freq}\n{file_list}"
@@ -102,7 +108,7 @@ def run_compare(infile: str, purge: bool, count: int, **kwargs):
     """
     # Load the file into a dictionary
     logger.info("Loading in file: %s" % infile)
-    with open(infile, "r") as stream:
+    with open(infile) as stream:
         files = json.load(stream)
     logger.info("Done!")
 

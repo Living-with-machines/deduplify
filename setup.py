@@ -10,7 +10,7 @@ AUTHOR = "Sarah Gibson"
 DESCRIPTION = (
     "A Python package to search for and remove duplicated files in messy datasets"
 )
-EMAIL = "sgibson@turing.ac.uk"
+EMAIL = "drsarahlgibson@gmail.com"
 LICENSE = "MIT"
 LICENSE_TROVE = "License :: OSI Approved :: MIT License"
 NAME = "deduplify"
@@ -19,14 +19,17 @@ URL = "https://github.com/Living-with-Machines/deduplify"
 VERSION = None
 
 # What packages are required for this module to be executed?
-with open(os.path.join(here, "requirements.txt"), "r") as f:
+with open(os.path.join(here, "requirements.txt")) as f:
     required = [line.strip("\n") for line in f.readlines()]
 
-REQUIRED = required + ["incremental"]
+with open(os.path.join(here, "dev-requirements.txt")) as f:
+    test_required = [line.strip("\n") for line in f.readlines()]
+
+REQUIRED = required
 full_require = []
 docs_require = []
-test_require = full_require + ["pytest", "coverage"]
-dev_require = ["incremental"]
+test_require = full_require + test_required
+dev_require = []
 
 # What packages are optional?
 EXTRAS = {
@@ -44,7 +47,7 @@ EXTRAS = {
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
 try:
-    with io.open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+    with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
         long_description = "\n" + f.read()
 except FileNotFoundError:
     long_description = DESCRIPTION
