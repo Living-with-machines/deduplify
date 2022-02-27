@@ -1,5 +1,4 @@
 import os
-from collections import defaultdict
 from tempfile import NamedTemporaryFile
 
 from tinydb import TinyDB
