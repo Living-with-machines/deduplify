@@ -38,7 +38,7 @@ def identify_unique_hashes(db) -> list:
     return list(set(all_hashes))
 
 
-def compare_filenames(hash: str, db) -> list[str]:
+def compare_filenames(hash: str, db) -> list:
     """Compare filenames for equivalence for a given hash.
 
     Args:
