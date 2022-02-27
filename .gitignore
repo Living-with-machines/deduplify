@@ -1,5 +1,6 @@
 # Ignore JSON output files
 **/*.json
+!**/test_db.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
