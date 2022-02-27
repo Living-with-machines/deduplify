@@ -15,12 +15,12 @@ Packages: tqdm
 
 import logging
 import os
-import jmespath
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from tqdm import tqdm
+import jmespath
 from tinydb import TinyDB, where
+from tqdm import tqdm
 
 logger = logging.getLogger()
 
