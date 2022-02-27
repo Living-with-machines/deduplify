@@ -38,21 +38,27 @@ def identify_unique_hashes(db) -> list:
     return list(set(all_hashes))
 
 
-    return filtered_dict
-
-
-def compare_filenames(file_list: list) -> str:
-    """Compare filenames for equivalence.
+def compare_filenames(hash: str, db) -> list[str]:
+    """Compare filenames for equivalence for a given hash.
 
     Args:
-        file_list (list): A list of filepaths to be checked
+        hash (str): The hash for which to compare the filepaths for.
+        db (TinyDB database): A TinyDB database object that contains the hash and
+            filepath information to analyse.
 
     Returns:
         file_list (list): In the case when filenames are identical, the
             shortest filepath is removed from the list and the rest are returned to be
-            deleted.
+            deleted. In the case where the filenames are not identical but,
+            coincidentally, the same length, then the first filepath in the list is
+            removed and the rest are returned to be deleted.
     """
+    expression = jmespath.compile("[*].filepath")
+    files_with_matching_hash = db.search(where("hash").matches(hash))
+
+    file_list = expression.search(files_with_matching_hash)
     file_list.sort()  # Sort the list of filepaths alphabetically
+
     filenames = [
         os.path.basename(filename) for filename in file_list
     ]  # Get the filenames
@@ -60,16 +66,16 @@ def compare_filenames(file_list: list) -> str:
 
     if len(name_freq) == 1:
         file_list.remove(min(file_list, key=len))
-        return file_list
     elif (len(name_freq) > 1) and (list(set(file_list)) == 1):
         # there are multiple filepaths that are different,
-        # but by coincidence have the same length
-        file_list = file_list.sort()
-        file_list.remove(file_list[1:])
+        # but, by coincidence, have the same length
+        file_list.remove(file_list[0])
     else:
         raise ValueError(
             f"The following filenames need investigation.\n{name_freq}\n{file_list}"
         )
+
+    return file_list
 
 
 def delete_files(files: list, workers: int):
