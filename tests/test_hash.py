@@ -1,10 +1,15 @@
 import os
 from collections import defaultdict
-
-from tinydb import TinyDB
 from tempfile import NamedTemporaryFile
 
-from deduplify.hash_files import get_total_number_of_files, hashfile, restart_run, identify_duplicates
+from tinydb import TinyDB
+
+from deduplify.hash_files import (
+    get_total_number_of_files,
+    hashfile,
+    identify_duplicates,
+    restart_run,
+)
 
 
 def test_get_total_number_of_files():
@@ -41,8 +46,18 @@ def test_identify_duplicates():
         test_db = TinyDB(test_f.name)
         expected_db = TinyDB(expected_f.name)
 
-    test_db.insert_multiple([{"hash": "hash1", "filepath": "file1.txt"}, {"hash": "hash1", "filepath": "file2.txt"}])
-    expected_db.insert_multiple([{"hash": "hash1", "filepath": "file1.txt", "duplicate": True}, {"hash": "hash1", "filepath": "file2.txt", "duplicate": True}])
+    test_db.insert_multiple(
+        [
+            {"hash": "hash1", "filepath": "file1.txt"},
+            {"hash": "hash1", "filepath": "file2.txt"},
+        ]
+    )
+    expected_db.insert_multiple(
+        [
+            {"hash": "hash1", "filepath": "file1.txt", "duplicate": True},
+            {"hash": "hash1", "filepath": "file2.txt", "duplicate": True},
+        ]
+    )
     updated_db = identify_duplicates(test_db)
 
     assert expected_db.all() == updated_db.all()
