@@ -25,10 +25,10 @@ def empty_dir_search(dir: str, **kwargs):
     counter = 0
     deleted = 0
 
-    for dirname, _, _ in os.walk(dir, topdown=False):
+    for dirname, subdirs, files in os.walk(dir, topdown=False):
         counter += 1
 
-        if len(os.listdir(dirname)) == 0:
+        if not subdirs and not files:
             logger.info("EMPTY: %s" % dirname)
             os.rmdir(dirname)
             deleted += 1
