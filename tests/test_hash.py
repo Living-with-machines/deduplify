@@ -2,8 +2,9 @@ import os
 from collections import defaultdict
 
 from tinydb import TinyDB
+from tempfile import NamedTemporaryFile
 
-from deduplify.hash_files import get_total_number_of_files, hashfile, restart_run
+from deduplify.hash_files import get_total_number_of_files, hashfile, restart_run, identify_duplicates
 
 
 def test_get_total_number_of_files():
@@ -33,3 +34,15 @@ def test_restart_run():
     files_to_be_skipped = restart_run(test_db)
 
     assert files_to_be_skipped == expected_list
+
+
+def test_identify_duplicates():
+    with NamedTemporaryFile("w") as test_f, NamedTemporaryFile("w") as expected_f:
+        test_db = TinyDB(test_f.name)
+        expected_db = TinyDB(expected_f.name)
+
+    test_db.insert_multiple([{"hash": "hash1", "filepath": "file1.txt"}, {"hash": "hash1", "filepath": "file2.txt"}])
+    expected_db.insert_multiple([{"hash": "hash1", "filepath": "file1.txt", "duplicate": True}, {"hash": "hash1", "filepath": "file2.txt", "duplicate": True}])
+    updated_db = identify_duplicates(test_db)
+
+    assert expected_db.all() == updated_db.all()
