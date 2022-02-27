@@ -16,8 +16,8 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
 
-from tqdm import tqdm
 from tinydb import TinyDB, where
+from tqdm import tqdm
 
 logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
@@ -118,9 +118,7 @@ def restart_run(db) -> list:
     return [os.path.basename(row["filepath"]) for row in db.all()]
 
 
-def run_hash(
-    dir: str, count: int, dbfile: str, restart: bool = False, **kwargs
-):
+def run_hash(dir: str, count: int, dbfile: str, restart: bool = False, **kwargs):
     """Hash files within a directory structure
 
     Args:
