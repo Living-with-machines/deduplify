@@ -3,11 +3,7 @@ from collections import defaultdict
 
 from tinydb import TinyDB
 
-from deduplify.hash_files import (
-    get_total_number_of_files,
-    hashfile,
-    restart_run,
-)
+from deduplify.hash_files import get_total_number_of_files, hashfile, restart_run
 
 
 def test_get_total_number_of_files():

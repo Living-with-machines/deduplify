@@ -1,14 +1,9 @@
 import os
-
 from unittest.mock import call, patch
 
 from tinydb import TinyDB
 
-from deduplify.compare_files import (
-    compare_filenames,
-    delete_files,
-    run_compare,
-)
+from deduplify.compare_files import compare_filenames, delete_files, run_compare
 
 
 def test_compare_filenames():
@@ -17,7 +12,7 @@ def test_compare_filenames():
     out_file_list = compare_filenames("test_hash", test_db)
 
     assert len(out_file_list) == 2
-    assert out_file_list == ["different/path/to/test/file.txt", 'path/to/test/file.txt']
+    assert out_file_list == ["different/path/to/test/file.txt", "path/to/test/file.txt"]
 
 
 def test_compare_filenames_same_length():
@@ -26,7 +21,7 @@ def test_compare_filenames_same_length():
     out_file_list = compare_filenames("test_hash", test_db)
 
     assert len(out_file_list) == 2
-    assert out_file_list == ['different/path/to/test/file.txt', "path/to/test/file.txt"]
+    assert out_file_list == ["different/path/to/test/file.txt", "path/to/test/file.txt"]
 
 
 @patch("deduplify.compare_files.os.remove")
@@ -44,7 +39,7 @@ def test_delete_files(mock):
 def test_run_compare_and_purge(mock):
     infile = "tests/assets/test_db.json"
     test_calls = [
-        call('different/path/to/test/file.txt'),
+        call("different/path/to/test/file.txt"),
         call("path/to/test/file.txt"),
     ]
 
