@@ -35,6 +35,29 @@ jobs:
         run: |
           python -m coverage run -m pytest -vvv
 
+      - name: Generate coverage report
+        if: github.event.pull_request
+        id: coverage_report
+        run: |
+          echo '::set-output name=COVERAGE_REPORT::$(coverage report)'
+
+      - name: Comment on PR with Coverage Report
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            var COVERAGE_REPORT = process.env.COVERAGE_REPORT;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${COVERAGE_REPORT}`
+            })
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage_report.outputs.COVERAGE_REPORT }}
+
       - name: Print coverage report
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           coverage report
