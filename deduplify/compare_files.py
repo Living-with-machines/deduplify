@@ -25,23 +25,18 @@ from tinydb import TinyDB, where
 logger = logging.getLogger()
 
 
-def filter_by_length(dict_to_filter: dict) -> dict:
-    """Filter a dictionary to return key-value pairs where the value's length is
-    greater than 1.
+def identify_unique_hashes(db) -> list:
+    """Generate a list of unique hashes from a TinyDB database object
 
     Args:
-        dict_to_filter (dict): The dictionary to be filtered
+        db (TinyDB database): The TinyDB database object to parse for hashes
 
     Returns:
-        filtered_dict (dict): The filtered dictionary
+        list: A list of the unique hashes contained within the database.
     """
-    filtered_dict = {
-        key: value for (key, value) in dict_to_filter.items() if len(value) > 1
-    }
+    all_hashes = [row["hash"] for row in db.all() if row["duplicate"]]
+    return list(set(all_hashes))
 
-    if len(filtered_dict) == 0:
-        logger.info("There are no filenames to compare!")
-        sys.exit()
 
     return filtered_dict
 
