@@ -103,23 +103,19 @@ def run_compare(infile: str, purge: bool, count: int, **kwargs):
     Args:
         infile (str): JSON location of filepaths and hashes
         purge (bool): Delete duplicated files
-        count (int): Number of threadsto parallelise over
+        count (int): Number of threads to parallelise over
     """
-    # Load the file into a dictionary
     logger.info("Loading in file: %s" % infile)
-    with open(infile) as stream:
-        files = json.load(stream)
-    logger.info("Done!")
+    db = TinyDB(infile)
 
-    # Filter the dictionary
-    files = filter_by_length(files)
-    logger.info("Number of files to compare: %s" % (len(files)))
+    # Find the unique hashes
+    hashes = identify_unique_hashes(db)
 
-    # Determine which filenames are duplicated
+    # Determine which filenames should be deleted
     files_to_delete = []
     logger.info("Comparing filenames...")
-    for value in tqdm(files.values(), total=len(files)):
-        files_to_delete.extend(compare_filenames(value))
+    for hash in hashes:
+        files_to_delete.extend(compare_filenames(hash, db))
     logger.info("Done!")
 
     logger.info("Number of files that can be safely deleted: %s" % len(files_to_delete))
