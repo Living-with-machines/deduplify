@@ -42,6 +42,7 @@ jobs:
           echo '::set-output name=COVERAGE_REPORT::$(coverage report)'
 
       - name: Comment on PR with Coverage Report
+        if: github.event.pull_request
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
