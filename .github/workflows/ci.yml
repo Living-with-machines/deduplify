@@ -45,7 +45,7 @@ jobs:
 
       - name: Comment on PR with Coverage Report
         if: github.event.pull_request && matrix.python-version == '3.9'
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
