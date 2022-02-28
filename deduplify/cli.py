@@ -82,7 +82,6 @@ def parse_args(args):
         "-f",
         "--dbfile",
         type=resolvepath,
-        dest="dbfile",
         default="file_hashes.json",
         help="Destination database for file hashes. Must be a JSON file. Default: file_hashes.json",
     )
