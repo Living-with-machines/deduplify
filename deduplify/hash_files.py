@@ -121,7 +121,7 @@ def restart_run(db) -> list:
     return [os.path.basename(row["filepath"]) for row in db.all()]
 
 
-def run_hash(dir: str, count: int, dbfile: str, restart: bool = False, **kwargs):
+def run_hash(dir: str, count: int, dbfile: str, restart: bool = False, file_ext: list = ["*"], **kwargs):
     """Hash files within a directory structure
 
     Args:
@@ -131,6 +131,8 @@ def run_hash(dir: str, count: int, dbfile: str, restart: bool = False, **kwargs)
         restart (bool): If true, will restart a hash run. dupfile and unfile
             must exist since the filenames already hashed will be skipped.
             Default: False.
+        file_ext (list[str]): A list of file extensions to search for. Default: all
+            extensions (['*']).
     """
     # Check the directory path exists
     if not os.path.exists(dir):
@@ -138,7 +140,7 @@ def run_hash(dir: str, count: int, dbfile: str, restart: bool = False, **kwargs)
 
     hashes_db = TinyDB(dbfile)
 
-    total_file_num = get_total_number_of_files(dir)
+    total_file_num = get_total_number_of_files(dir, file_ext)
 
     if restart:
         files_to_skip = restart_run(hashes_db)
@@ -157,6 +159,7 @@ def run_hash(dir: str, count: int, dbfile: str, restart: bool = False, **kwargs)
                 executor.submit(hashfile, os.path.join(dirName, filename))
                 for filename in fileList
                 if filename not in files_to_skip
+                if os.path.splitext(filename)[1] in file_ext
             ]
             for future in as_completed(futures):
                 hash, filepath = future.result()
