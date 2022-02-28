@@ -16,9 +16,11 @@ def test_get_total_number_of_files():
 
     output1 = get_total_number_of_files(dirpath)
     output2 = get_total_number_of_files(dirpath, file_ext=["txt"])
+    output3 = get_total_number_of_files(dirpath, file_ext=["txt", "xml"])
 
     assert output1 == 3
     assert output2 == 1
+    assert output3 == 3
 
 
 def test_hashfile():
