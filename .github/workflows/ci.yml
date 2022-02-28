@@ -44,7 +44,7 @@ jobs:
           echo '::set-output name=COVERAGE_REPORT::$(coverage report)'
 
       - name: Comment on PR with Coverage Report
-        if: github.event.pull_request
+        if: github.event.pull_request && matrix.python-version == '3.9'
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
