@@ -89,7 +89,7 @@ def parse_args(args):
     parser_hash.add_argument(
         "--restart",
         action="store_true",
-        help="Restart a run of hashing files and skip over files that have already been hashed. Output files containing duplicated and unique filenames must already exist.",
+        help="Restart a run of hashing files and skip over files that have already been hashed. Output file containing a database of filenames and hashes must already exist.",
     )
 
     # Compare subcommand
