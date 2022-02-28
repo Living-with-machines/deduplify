@@ -82,9 +82,11 @@ def parse_args(args):
         "-f",
         "--dbfile",
         type=resolvepath,
-        dest="dbfile",
         default="file_hashes.json",
         help="Destination database for file hashes. Must be a JSON file. Default: file_hashes.json",
+    )
+    parser.add_argument(
+        "--exts", nargs="?", help="A list of file extensions to search for."
     )
     parser_hash.add_argument(
         "--restart",

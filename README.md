@@ -78,10 +78,13 @@ Each document in the generated database can be described as a dictionary with th
 }
 ```
 
+By default, `deduplify` generates hashes for all files under a directory.
+But one or more specific file extensions to search for can be specified using the `--ext` flag.
+
 **Command line usage:**
 
 ```bash
-usage: deduplify hash [-h] [-c COUNT] [-v] [-f DBFILE] [--restart] dir
+usage: deduplify hash [-h] [-c COUNT] [-v] [-f DBFILE] [--exts [EXTS]] [--restart] dir
 
 positional arguments:
   dir                   Path to directory to begin search from
@@ -93,8 +96,9 @@ optional arguments:
   -v, --verbose         Print logging messages to the console
   -f DBFILE, --dbfile DBFILE
                         Destination database for file hashes. Must be a JSON file. Default: file_hashes.json
-  --restart             Restart a run of hashing files and skip over files that have already been hashed. Output files containing duplicated and
-                        unique filenames must already exist.
+  --exts [EXTS]         A list of file extensions to search for.
+  --restart             Restart a run of hashing files and skip over files that have already been hashed. Output file containing a database of
+                        filenames and hashes must already exist.
 ```
 
 ### Comparing files
