@@ -121,7 +121,14 @@ def restart_run(db) -> list:
     return [os.path.basename(row["filepath"]) for row in db.all()]
 
 
-def run_hash(dir: str, count: int, dbfile: str, restart: bool = False, file_ext: list = ["*"], **kwargs):
+def run_hash(
+    dir: str,
+    count: int,
+    dbfile: str,
+    restart: bool = False,
+    file_ext: list = ["*"],
+    **kwargs,
+):
     """Hash files within a directory structure
 
     Args:
