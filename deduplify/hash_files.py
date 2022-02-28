@@ -23,12 +23,13 @@ logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
 
 
-def get_total_number_of_files(target_dir: str, file_ext: str = "*") -> int:
+def get_total_number_of_files(target_dir: str, file_ext: list = ["*"]) -> int:
     """Count the total number of files of a given extension in a directory.
 
     Args:
         target_dir (str): The target directory to search.
-        file_ext (str): The file extension to search for. Default: all extensions.
+        file_ext (list[str]): A list of file extensions to search for. Default: all
+            extensions (['*']).
 
     Returns:
         int: The number of files with the matching extension within the tree
@@ -36,11 +37,13 @@ def get_total_number_of_files(target_dir: str, file_ext: str = "*") -> int:
     """
     logger.info("Calculating number of files that will be hashed in %s" % target_dir)
 
-    output = len(fnmatch.filter(os.listdir(target_dir), f"*.{file_ext}"))
+    num_of_files = 0
+    for ext in file_ext:
+        num_of_files += len(fnmatch.filter(os.listdir(target_dir), f"*.{ext}"))
 
-    logger.info(f"{output} files to be hashed in {target_dir}")
+    logger.info(f"{num_of_files} files to be hashed in {target_dir}")
 
-    return output
+    return num_of_files
 
 
 def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
