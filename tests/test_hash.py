@@ -15,7 +15,7 @@ def test_get_total_number_of_files():
     dirpath = os.path.join("tests", "testdir")
 
     output1 = get_total_number_of_files(dirpath)
-    output2 = get_total_number_of_files(dirpath, file_ext="txt")
+    output2 = get_total_number_of_files(dirpath, file_ext=["txt"])
 
     assert output1 == 3
     assert output2 == 1
