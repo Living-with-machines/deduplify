@@ -1,31 +1,23 @@
 import os
-from collections import defaultdict
+from tempfile import NamedTemporaryFile
+
+from tinydb import TinyDB
 
 from deduplify.hash_files import (
-    filter_dict,
     get_total_number_of_files,
     hashfile,
+    identify_duplicates,
     restart_run,
-    transform_dict,
 )
-
-
-def test_filter_dict():
-    test_dict = {"hash1": ["filepath1"], "hash2": ["filepath2", "filepath3"]}
-
-    dupdict, undict = filter_dict(test_dict)
-
-    assert dupdict == {"hash2": ["filepath2", "filepath3"]}
-    assert undict == {"hash1": "filepath1"}
 
 
 def test_get_total_number_of_files():
     dirpath = os.path.join("tests", "testdir")
 
     output1 = get_total_number_of_files(dirpath)
-    output2 = get_total_number_of_files(dirpath, file_ext=".txt")
+    output2 = get_total_number_of_files(dirpath, file_ext="txt")
 
-    assert output1 == 2
+    assert output1 == 3
     assert output2 == 1
 
 
@@ -38,31 +30,33 @@ def test_hashfile():
     assert outpath == path
 
 
-def test_transform_dict():
-    test_dict = {"key1": "value1", "key2": "value2"}
-    expected = {"key1": ["value1"], "key2": ["value2"]}
-
-    output = transform_dict(test_dict)
-
-    assert output == expected
-
-
 def test_restart_run():
-    dup_file = os.path.join(os.getcwd(), "tests", "assets", "test_duplicates.json")
-    un_file = os.path.join(os.getcwd(), "tests", "assets", "test_uniques.json")
+    test_db = TinyDB(os.path.join("tests", "assets", "test_db.json"))
 
-    expected_dict = defaultdict(
-        list,
-        {
-            "key1": ["valueA", "valueB"],
-            "key2": ["valueC", "valueD"],
-            "key3": ["valueE"],
-            "key4": ["valueF"],
-        },
-    )
-    expected_list = ["valueA", "valueB", "valueC", "valueD", "valueE", "valueF"]
+    expected_list = ["file.txt", "file.txt", "file.txt"]
 
-    hashes, files_to_be_skipped = restart_run(dup_file, un_file)
+    files_to_be_skipped = restart_run(test_db)
 
-    assert hashes == expected_dict
     assert files_to_be_skipped == expected_list
+
+
+def test_identify_duplicates():
+    with NamedTemporaryFile("w") as test_f, NamedTemporaryFile("w") as expected_f:
+        test_db = TinyDB(test_f.name)
+        expected_db = TinyDB(expected_f.name)
+
+    test_db.insert_multiple(
+        [
+            {"hash": "hash1", "filepath": "file1.txt"},
+            {"hash": "hash1", "filepath": "file2.txt"},
+        ]
+    )
+    expected_db.insert_multiple(
+        [
+            {"hash": "hash1", "filepath": "file1.txt", "duplicate": True},
+            {"hash": "hash1", "filepath": "file2.txt", "duplicate": True},
+        ]
+    )
+    updated_db = identify_duplicates(test_db)
+
+    assert expected_db.all() == updated_db.all()

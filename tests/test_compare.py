@@ -1,43 +1,27 @@
+import os
 from unittest.mock import call, patch
 
-from deduplify.compare_files import (
-    compare_filenames,
-    delete_files,
-    filter_by_length,
-    run_compare,
-)
+from tinydb import TinyDB
 
-
-def test_filter_by_length():
-    test_dict = {"key1": ["value1"], "key2": ["value2", "value3"]}
-
-    out_dict = filter_by_length(test_dict)
-
-    assert out_dict == {"key2": ["value2", "value3"]}
+from deduplify.compare_files import compare_filenames, delete_files, run_compare
 
 
 def test_compare_filenames():
-    test_file_list = [
-        "path/to/test/file.txt",
-        "different/path/to/test/file.txt",
-    ]
+    test_db = TinyDB(os.path.join("tests", "assets", "test_db.json"))
 
-    out_file_list = compare_filenames(test_file_list)
+    out_file_list = compare_filenames("test_hash", test_db)
 
-    assert len(out_file_list) == 1
-    assert out_file_list == ["different/path/to/test/file.txt"]
+    assert len(out_file_list) == 2
+    assert out_file_list == ["different/path/to/test/file.txt", "path/to/test/file.txt"]
 
 
 def test_compare_filenames_same_length():
-    test_file_list = [
-        "path/to/test/file.txt",
-        "diff/xy/path/file.txt",
-    ]
+    test_db = TinyDB(os.path.join("tests", "assets", "test_db.json"))
 
-    out_file_list = compare_filenames(test_file_list)
+    out_file_list = compare_filenames("test_hash", test_db)
 
-    assert len(out_file_list) == 1
-    assert out_file_list == ["path/to/test/file.txt"]
+    assert len(out_file_list) == 2
+    assert out_file_list == ["different/path/to/test/file.txt", "path/to/test/file.txt"]
 
 
 @patch("deduplify.compare_files.os.remove")
@@ -53,10 +37,10 @@ def test_delete_files(mock):
 
 @patch("deduplify.compare_files.os.remove")
 def test_run_compare_and_purge(mock):
-    infile = "tests/assets/test_infile.json"
+    infile = "tests/assets/test_db.json"
     test_calls = [
-        call("different/path/to/test/file_1.txt"),
-        call("different/path/to/test/file_2.txt"),
+        call("different/path/to/test/file.txt"),
+        call("path/to/test/file.txt"),
     ]
 
     run_compare(infile, True, 1)
