@@ -11,8 +11,6 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     strategy:
       fail-fast: false  # Don't cancel all jobs if one fails
       matrix:
