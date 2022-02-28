@@ -13,51 +13,52 @@ Packages: tqdm
 >>> pip install tqdm
 """
 
-import json
 import logging
 import os
-import sys
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import jmespath
+from tinydb import TinyDB, where
 from tqdm import tqdm
 
 logger = logging.getLogger()
 
 
-def filter_by_length(dict_to_filter: dict) -> dict:
-    """Filter a dictionary to return key-value pairs where the value's length is
-    greater than 1.
+def identify_unique_hashes(db) -> list:
+    """Generate a list of unique hashes from a TinyDB database object
 
     Args:
-        dict_to_filter (dict): The dictionary to be filtered
+        db (TinyDB database): The TinyDB database object to parse for hashes
 
     Returns:
-        filtered_dict (dict): The filtered dictionary
+        list: A list of the unique hashes contained within the database.
     """
-    filtered_dict = {
-        key: value for (key, value) in dict_to_filter.items() if len(value) > 1
-    }
-
-    if len(filtered_dict) == 0:
-        logger.info("There are no filenames to compare!")
-        sys.exit()
-
-    return filtered_dict
+    all_hashes = [row["hash"] for row in db.all() if row["duplicate"]]
+    return list(set(all_hashes))
 
 
-def compare_filenames(file_list: list) -> str:
-    """Compare filenames for equivalence.
+def compare_filenames(hash: str, db) -> list:
+    """Compare filenames for equivalence for a given hash.
 
     Args:
-        file_list (list): A list of filepaths to be checked
+        hash (str): The hash for which to compare the filepaths for.
+        db (TinyDB database): A TinyDB database object that contains the hash and
+            filepath information to analyse.
 
     Returns:
         file_list (list): In the case when filenames are identical, the
-                          shortest filepath is removed from the list and the
-                          rest are returned to be deleted.
+            shortest filepath is removed from the list and the rest are returned to be
+            deleted. In the case where the filenames are not identical but,
+            coincidentally, the same length, then the first filepath in the list is
+            removed and the rest are returned to be deleted.
     """
+    expression = jmespath.compile("[*].filepath")
+    files_with_matching_hash = db.search(where("hash").matches(hash))
+
+    file_list = expression.search(files_with_matching_hash)
     file_list.sort()  # Sort the list of filepaths alphabetically
+
     filenames = [
         os.path.basename(filename) for filename in file_list
     ]  # Get the filenames
@@ -65,16 +66,16 @@ def compare_filenames(file_list: list) -> str:
 
     if len(name_freq) == 1:
         file_list.remove(min(file_list, key=len))
-        return file_list
     elif (len(name_freq) > 1) and (list(set(file_list)) == 1):
         # there are multiple filepaths that are different,
-        # but by coincidence have the same length
-        file_list = file_list.sort()
-        file_list.remove(file_list[1:])
+        # but, by coincidence, have the same length
+        file_list.remove(file_list[0])
     else:
         raise ValueError(
             f"The following filenames need investigation.\n{name_freq}\n{file_list}"
         )
+
+    return file_list
 
 
 def delete_files(files: list, workers: int):
@@ -102,23 +103,19 @@ def run_compare(infile: str, purge: bool, count: int, **kwargs):
     Args:
         infile (str): JSON location of filepaths and hashes
         purge (bool): Delete duplicated files
-        count (int): Number of threadsto parallelise over
+        count (int): Number of threads to parallelise over
     """
-    # Load the file into a dictionary
     logger.info("Loading in file: %s" % infile)
-    with open(infile) as stream:
-        files = json.load(stream)
-    logger.info("Done!")
+    db = TinyDB(infile)
 
-    # Filter the dictionary
-    files = filter_by_length(files)
-    logger.info("Number of files to compare: %s" % (len(files)))
+    # Find the unique hashes
+    hashes = identify_unique_hashes(db)
 
-    # Determine which filenames are duplicated
+    # Determine which filenames should be deleted
     files_to_delete = []
     logger.info("Comparing filenames...")
-    for value in tqdm(files.values(), total=len(files)):
-        files_to_delete.extend(compare_filenames(value))
+    for hash in hashes:
+        files_to_delete.extend(compare_filenames(hash, db))
     logger.info("Done!")
 
     logger.info("Number of files that can be safely deleted: %s" % len(files_to_delete))

@@ -1,0 +1,19 @@
+{
+    "_default": {
+        "1": {
+            "hash": "test_hash",
+            "filepath": "path/to/test/file.txt",
+            "duplicate": true
+        },
+        "2": {
+            "hash": "test_hash",
+            "filepath": "diff/xy/path/file.txt",
+            "duplicate": true
+        },
+        "3": {
+            "hash": "test_hash",
+            "filepath": "different/path/to/test/file.txt",
+            "duplicate": true
+        }
+    }
+}
