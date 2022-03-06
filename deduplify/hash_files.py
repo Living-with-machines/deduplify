@@ -14,7 +14,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
 
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
@@ -102,21 +102,30 @@ def run_hash(
                 executor.submit(hashfile, os.path.join(dirName, filename))
                 for filename in fileList
                 if filename not in files_to_skip
-                if os.path.splitext(filename)[1].replace(".", "") in file_ext or file_ext == ["*"]
+                if os.path.splitext(filename)[1].replace(".", "") in file_ext
+                or file_ext == ["*"]
             ]
             for future in as_completed(futures):
                 hash, filepath = future.result()
 
                 if hashes_db.contains(DBQuery.hash == hash):
-                    hashes_db.insert({"hash": hash, "filepath": filepath, "duplicate": True})
+                    hashes_db.insert(
+                        {"hash": hash, "filepath": filepath, "duplicate": True}
+                    )
                     hashes_db.update({"duplicate": True}, DBQuery.hash == hash)
                 else:
-                    hashes_db.insert({"hash": hash, "filepath": filepath, "duplicate": False})
+                    hashes_db.insert(
+                        {"hash": hash, "filepath": filepath, "duplicate": False}
+                    )
 
                 count_files_hashed += 1
                 print(f"Total files hashed: {count_files_hashed}", end="\r", flush=True)
 
     # Calculate number of unique and duplicated files
     logger.info("Number of files hashed: %s" % len(hashes_db))
-    logger.info("Number of unique files: %s" % hashes_db.count(DBQuery.duplicate == False))
-    logger.info("Number of duplicated files: %s" % hashes_db.count(DBQuery.duplicate == True))
+    logger.info(
+        "Number of unique files: %s" % hashes_db.count(DBQuery.duplicate == False)
+    )
+    logger.info(
+        "Number of duplicated files: %s" % hashes_db.count(DBQuery.duplicate == True)
+    )
