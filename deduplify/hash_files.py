@@ -12,11 +12,10 @@ import sys
 import hashlib
 import logging
 import os
-from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
 
-from tinydb import TinyDB, where
+from tinydb import TinyDB, Query
 
 logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
@@ -48,37 +47,6 @@ def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
     f.close()
 
     return hasher.hexdigest(), path.replace(EXPANDED_USER, "~")
-
-
-def identify_duplicates(db):
-    """Identify duplicated documents in a given TinyDB database based on the whether
-    the hash key in each document is unique in the whole database.
-
-    Args:
-        db (TinyDB database): The TinyDB database object to be filtered
-
-    Returns:
-        db (TinyDB database): The database updated with the "duplicate" key
-            containing a Boolean value indicating if the file has a duplicate or not.
-    """
-    logger.info("Filtering the results...")
-
-    all_hashes = [row["hash"] for row in db.all()]
-    counted_hashes = Counter(all_hashes)
-
-    # Add duplicate key to each document in the database indicating
-    # whether it is a duplicate or not
-    for k, v in counted_hashes.items():
-        if v == 1:
-            db.update({"duplicate": False}, where("hash") == k)
-        elif v > 1:
-            db.update({"duplicate": True}, where("hash") == k)
-
-    # Calculate number of unique and duplicated files
-    logger.info("Number of unique files: %s" % db.count(where("duplicate") == False))
-    logger.info("Number of duplicated files: %s" % db.count(where("duplicate") == True))
-
-    return db
 
 
 def restart_run(db) -> list:
@@ -118,6 +86,7 @@ def run_hash(
         raise ValueError("Please provide a known filepath!")
 
     hashes_db = TinyDB(dbfile)
+    DBQuery = Query()
 
     if restart:
         files_to_skip = restart_run(hashes_db)
@@ -138,10 +107,18 @@ def run_hash(
             ]
             for future in as_completed(futures):
                 hash, filepath = future.result()
-                hashes_db.insert({"hash": hash, "filepath": filepath})
+
+                if hashes_db.contains(DBQuery.hash == hash):
+                    hashes_db.insert({"hash": hash, "filepath": filepath, "duplicate": True})
+                    hashes_db.update({"duplicate": True}, DBQuery.hash == hash)
+                else:
+                    hashes_db.insert({"hash": hash, "filepath": filepath, "duplicate": False})
 
                 count_files_hashed += 1
                 print(f"Total files hashed: {count_files_hashed}", end="\r")
                 sys.stdout.flush()
 
-    hashes_db = identify_duplicates(hashes_db)
+    # Calculate number of unique and duplicated files
+    logger.info("Number of files hashed: %s" % len(hashes_db))
+    logger.info("Number of unique files: %s" % hashes_db.count(DBQuery.duplicate == False))
+    logger.info("Number of duplicated files: %s" % hashes_db.count(DBQuery.duplicate == True))
