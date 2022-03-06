@@ -8,7 +8,6 @@ together files that have generated the same hash.
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
-import sys
 import hashlib
 import logging
 import os
@@ -115,8 +114,7 @@ def run_hash(
                     hashes_db.insert({"hash": hash, "filepath": filepath, "duplicate": False})
 
                 count_files_hashed += 1
-                print(f"Total files hashed: {count_files_hashed}", end="\r")
-                sys.stdout.flush()
+                print(f"Total files hashed: {count_files_hashed}", end="\r", flush=True)
 
     # Calculate number of unique and duplicated files
     logger.info("Number of files hashed: %s" % len(hashes_db))
