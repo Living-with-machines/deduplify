@@ -8,6 +8,7 @@ together files that have generated the same hash.
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
+import sys
 import hashlib
 import logging
 import os
@@ -126,6 +127,7 @@ def run_hash(
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
 
+    count_files_hashed = 0
     for dirName, _, fileList in os.walk(dir):
         with ThreadPoolExecutor(max_workers=count) as executor:
             futures = [
@@ -137,5 +139,9 @@ def run_hash(
             for future in as_completed(futures):
                 hash, filepath = future.result()
                 hashes_db.insert({"hash": hash, "filepath": filepath})
+
+                count_files_hashed += 1
+                print(f"Total files hashed: {count_files_hashed}", end="\r")
+                sys.stdout.flush()
 
     hashes_db = identify_duplicates(hashes_db)
