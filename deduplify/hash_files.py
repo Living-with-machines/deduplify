@@ -87,8 +87,7 @@ def identify_duplicates(db):
     """
     logger.info("Filtering the results...")
 
-    all_rows = db.all()
-    all_hashes = [row["hash"] for row in all_rows]
+    all_hashes = [row["hash"] for row in db.all()]
     counted_hashes = Counter(all_hashes)
 
     # Add duplicate key to each document in the database indicating
