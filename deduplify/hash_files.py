@@ -102,7 +102,7 @@ def run_hash(
                 executor.submit(hashfile, os.path.join(dirName, filename))
                 for filename in fileList
                 if filename not in files_to_skip
-                if os.path.splitext(filename)[1] in file_ext
+                if os.path.splitext(filename)[1].replace(".", "") in file_ext or file_ext == ["*"]
             ]
             for future in as_completed(futures):
                 hash, filepath = future.result()
