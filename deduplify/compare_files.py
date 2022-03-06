@@ -15,6 +15,7 @@ Packages: tqdm
 
 import logging
 import os
+import warnings
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -71,8 +72,9 @@ def compare_filenames(hash: str, db) -> list:
         # but, by coincidence, have the same length
         file_list.remove(file_list[0])
     else:
-        raise ValueError(
-            f"The following filenames need investigation.\n{name_freq}\n{file_list}"
+        # Hashes are same but filenames are different
+        warnings.warn(
+            "The following filenames need investigation.\n- " + "\n- ".join(file_list)
         )
 
     return file_list
