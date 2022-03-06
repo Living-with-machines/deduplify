@@ -8,7 +8,6 @@ together files that have generated the same hash.
 Author: Sarah Gibson
 Python version: >=3.7 (developed with 3.8)
 """
-import fnmatch
 import hashlib
 import logging
 import os
@@ -17,33 +16,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple
 
 from tinydb import TinyDB, where
-from tqdm import tqdm
 
 logger = logging.getLogger()
 EXPANDED_USER = os.path.expanduser("~")
-
-
-def get_total_number_of_files(target_dir: str, file_ext: list = ["*"]) -> int:
-    """Count the total number of files of a given extension in a directory.
-
-    Args:
-        target_dir (str): The target directory to search.
-        file_ext (list[str]): A list of file extensions to search for. Default: all
-            extensions (['*']).
-
-    Returns:
-        int: The number of files with the matching extension within the tree
-            of the target directory
-    """
-    logger.info("Calculating number of files that will be hashed in %s" % target_dir)
-
-    num_of_files = 0
-    for ext in file_ext:
-        num_of_files += len(fnmatch.filter(os.listdir(target_dir), f"*.{ext}"))
-
-    logger.info(f"{num_of_files} files to be hashed in {target_dir}")
-
-    return num_of_files
 
 
 def hashfile(path: str, blocksize: int = 65536) -> Tuple[str, str]:
@@ -143,8 +118,6 @@ def run_hash(
 
     hashes_db = TinyDB(dbfile)
 
-    total_file_num = get_total_number_of_files(dir, file_ext)
-
     if restart:
         files_to_skip = restart_run(hashes_db)
     else:
@@ -152,9 +125,6 @@ def run_hash(
 
     logger.info("Walking structure of: %s" % dir)
     logger.info("Generating MD5 hashes for files...")
-
-    total = total_file_num - len(files_to_skip)
-    pbar = tqdm(total=total)
 
     for dirName, _, fileList in os.walk(dir):
         with ThreadPoolExecutor(max_workers=count) as executor:
@@ -167,9 +137,5 @@ def run_hash(
             for future in as_completed(futures):
                 hash, filepath = future.result()
                 hashes_db.insert({"hash": hash, "filepath": filepath})
-
-                pbar.update(1)
-
-    pbar.close()
 
     hashes_db = identify_duplicates(hashes_db)
