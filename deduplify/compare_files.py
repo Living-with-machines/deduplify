@@ -74,8 +74,7 @@ def compare_filenames(hash: str, db) -> list:
     else:
         # Hashes are same but filenames are different
         warnings.warn(
-            "The following filenames need investigation.\n- "
-            + "\n- ".join(file_list)
+            "The following filenames need investigation.\n- " + "\n- ".join(file_list)
         )
 
     return file_list
