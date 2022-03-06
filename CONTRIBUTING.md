@@ -13,12 +13,13 @@ Use your best judgment and feel free to propose changes to this document in a pu
 - [How can I contribute?](#how-can-i-contribute)
   - [Reporting bugs and/or missing features](#reporting-bugs-andor-missing-features)
   - [Pull Requests](#pull-requests)
-- [Styleguides](#styleguides)
-  - [Python Styleguide](#python-styleguide)
+  - [Making a Release](#making-a-release)
+- [Style Guides](#style-guides)
+  - [Python Style Guide](#python-style-guide)
 
 ---
 
-### Code of Conduct
+## Code of Conduct
 
 This project and everyone participating in it is governed by the project's [Code of Conduct](./CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code.
@@ -50,11 +51,38 @@ If you find or file an issue in the project that you would like to work on, here
 3. When you open your Pull Request, please complete the PR template to the best of your ability.
 4. Please try to maintain passing status checks on your Pull Request. However, the project team can help with tricky test failures.
 
-## Styleguides
+### Making a Release
 
-### Python Styleguide
+We use a package called [`incremental`](https://github.com/twisted/incremental) to simplify the changing the [semantic version](https://semver.org/) of the package.
+A [GitHub Action workflow](https://github.com/Living-with-machines/deduplify/blob/HEAD/.github/workflows/pypi.yml) is configured to build and publish the package on [PyPI](https://pypi.org/project/deduplify/) when a new release is published.
+
+To make a release, follow these steps:
+
+1. Bump the package version using `incremental`.
+   Add and commit the edited `_version.py` file in the `deduplify` folder.
+   This can either be done as a commit in a larger Pull Request, or in a PR by itself.
+   - To increase the patch of the version, run:
+     ```bash
+     python -m incremental.update --patch deduplify
+     ```
+   - To increase either the major or minor tag of the version, run:
+     ```bash
+     python -m incremental.update --newversion X.Y.Z deduplify
+     ```
+     where `X.Y.Z` matches a valid SEMVAR version number.
+2. In the GitHub browser, make a new release tag.
+   - Click the `Releases` tab at the top of the repository
+   - Click the `Draft a new release` button
+   - In the `Choose a tag` dropdown menu, type your new version with a leading `v`, e.g., `vX.Y.Z`.
+     This tag won't exist yet, so select `Create new tag on publish`.
+   - Click `Auto-generate release notes` to automatically generate the release notes
+   - Click `Publish release`
+## Style Guides
+
+### Python Style Guide
 
 `deduplify` is a Python package and we try to maintain certain formatting standards for readability and consistency, but also that _you_ don't have to worry about the style either!
 
-All Python files within this project are run through [`black`](https://github.com/psf/black) and [`flake8`](https://flake8.pycqa.org/en/latest/) for formatting and linting checks as part of our CI workflow.
-While not conforming to these standards won't block a contributing, we really recommend sticking with them for the hygiene of the project.
+All Python files within this project are run through [`black`](https://github.com/psf/black), [`flake8`](https://flake8.pycqa.org/en/latest/), [`pyupgrade`](https://github.com/asottile/pyupgrade) and [`isort`](https://pycqa.github.io/isort/) for formatting and linting using [`pre-commit`](https://pre-commit.ci).
+`pre-commit` will automatically apply the required changes to all Python files in order to ensure they conform to the style guide.
+You can see the [`pre-commit` config file](https://github.com/Living-with-machines/deduplify/blob/HEAD/.pre-commit-config.yaml) in the repository.
