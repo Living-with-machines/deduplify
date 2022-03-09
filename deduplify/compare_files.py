@@ -72,10 +72,11 @@ def compare_filenames(hash: str, db) -> list:
         # but, by coincidence, have the same length
         file_list.remove(file_list[0])
     else:
-        # Hashes are same but filenames are different
+        # Hashes are same but filenames are different, return an empty list
         warnings.warn(
             "The following filenames need investigation.\n- " + "\n- ".join(file_list)
         )
+        file_list = []
 
     return file_list
 
