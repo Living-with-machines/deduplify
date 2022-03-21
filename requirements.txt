@@ -1,5 +1,5 @@
 incremental
-jmespath==0.10.0
+jmespath==1.0.0
 tinydb==4.7.0
 tqdm
 twisted
