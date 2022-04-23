@@ -8,9 +8,9 @@ already have been executed. Using the --purge option will delete the duplicated
 files.
 
 Python version: >= 3.7 (developed with 3.8)
-Packages: tqdm
+Packages: tqdm, rich
 
->>> pip install tqdm
+>>> pip install tqdm rich
 """
 
 import logging
@@ -20,6 +20,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import jmespath
+from rich import print_json
 from tinydb import TinyDB, where
 from tqdm import tqdm
 
@@ -100,11 +101,12 @@ def delete_files(files: list, workers: int):
     logger.info("Deletion complete!")
 
 
-def run_compare(infile: str, purge: bool, count: int, **kwargs):
+def run_compare(infile: str, list_files: bool, purge: bool, count: int, **kwargs):
     """Compare files for duplicated hashes
 
     Args:
         infile (str): JSON location of filepaths and hashes
+        list_files (bool): Print list of duplicated files to the console
         purge (bool): Delete duplicated files
         count (int): Number of threads to parallelise over
     """
@@ -122,6 +124,10 @@ def run_compare(infile: str, purge: bool, count: int, **kwargs):
     logger.info("Done!")
 
     logger.info("Number of files that can be safely deleted: %s" % len(files_to_delete))
+
+    if list_files:
+        print("Duplicated files:")
+        print_json(data=files_to_delete)
 
     if purge:
         delete_files(files_to_delete, count)

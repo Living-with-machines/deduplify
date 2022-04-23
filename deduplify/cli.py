@@ -110,6 +110,11 @@ def parse_args(args):
         help="Database to analyse. Must be a JSON file. Default: file_hashes.json",
     )
     parser_compare.add_argument(
+        "--list-files",
+        action="store_true",
+        help="List duplicated files. Default: False",
+    )
+    parser_compare.add_argument(
         "--purge", action="store_true", help="Deletes duplicated files. Default: False"
     )
 
