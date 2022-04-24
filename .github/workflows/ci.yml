@@ -33,7 +33,7 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m coverage run -m pytest -vvv
+          python -m coverage run -m pytest -vvv --color=yes
 
       - name: Print coverage report
         run: |
