@@ -124,7 +124,7 @@ deduplify compare          # Compare the filenames again. The code should return
 **Command line usage:**
 
 ```bash
-usage: deduplify compare [-h] [-c COUNT] [-v] [-f INFILE] [--purge]
+usage: deduplify compare [-h] [-c COUNT] [-v] [-f INFILE] [--list-files] [--purge]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -133,6 +133,7 @@ optional arguments:
   -v, --verbose         Print logging messages to the console
   -f INFILE, --infile INFILE
                         Database to analyse. Must be a JSON file. Default: file_hashes.json
+  --list-files          List duplicated files. Default: False
   --purge               Deletes duplicated files. Default: False
   ```
 

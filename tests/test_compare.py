@@ -43,7 +43,7 @@ def test_run_compare_and_purge(mock):
         call("path/to/test/file.txt"),
     ]
 
-    run_compare(infile, True, 1)
+    run_compare(infile, False, True, 1)
 
     assert mock.call_count == 2
     mock.assert_has_calls(test_calls)
