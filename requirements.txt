@@ -1,6 +1,6 @@
 incremental
 jmespath==1.0.0
-rich==12.3.0
+rich==12.4.1
 tinydb==4.7.0
 tqdm
 twisted
